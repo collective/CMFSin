@@ -9,11 +9,15 @@ from Products.CMFCore.utils import UniqueObject, getToolByName
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from StringIO import StringIO
 import os, os.path
+import re
 
 from Map import Map
 from Channel import Channel
 from rssparser import parse
 from OrderPolicy import listPolicies
+
+
+schedRe = re.compile("(?P<freq>\d+)(?P<period>h|d|w|m|y):")
 
 class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
     """ CMF Syndication Client  """
@@ -58,7 +62,6 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
             self.data[channel.id] = data
         except (IOError, OSError):
             channel.failed()
-        
     
     def updateChannel(self, channel, force=0):
         if not isinstance(channel, Channel):
@@ -114,8 +117,8 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
         return results
 
 
-    def addChannel(self, name, url):
-        c = Channel(name, url)
+    def addChannel(self, name, url, **kwargs):
+        c = Channel(name, url, **kwargs)
         self.channels[name] = c
         
     def addMap(self, map, channels=[]):
@@ -136,9 +139,17 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
         
         s = 'channels'
         options = config.options(s)
+        args = {}
         for o in options:
-            self.addChannel(o, config.get(s, o, raw=1))
-
+            uri =  config.get(s, o, raw=1)
+            match = schedRe.match(uri)
+            if match:
+                uri = uri[match.end():]
+                args['period']    = match.group('period')
+                args['frequency'] = int(match.group('freq'))
+            self.addChannel(o, uri, **args)
+            args.clear()
+            
         s = 'maps'
         options = config.options(s)
         for o in options:
