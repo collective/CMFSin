@@ -31,7 +31,7 @@
 			<span tal:condition="python: verbose and row.get('description') or nothing" tal:replace="structure row/description"/>
 	      </div>
 	    </div>
-	  &nbsp;&nbsp;&nbsp;...<a  tal:attributes="href  python:'sinList?synmap=%s' % m">Complete List</a>
+	  &nbsp;&nbsp;&nbsp;...<a  tal:attributes="href  python:'sinList?synmap=%s' % m" i18n:translate="complete_list">Complete List</a>
         </div>         
       </div>
     </div>
