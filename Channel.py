@@ -1,3 +1,4 @@
+from Acquisition import aq_base
 from OFS.SimpleItem import SimpleItem
 from DateTime import DateTime
 
@@ -28,31 +29,39 @@ class Channel(SimpleItem):
         self.title = id
         self.uri  = uri
 
-        self.updateBase      = None
+        self._v_updateBase      = None
         self.updatePeriod    = TIME_KEY[kwargs.get('period', 'd')]
         self.updateFrequency = int(kwargs.get('frequency', 1))
         self._v_failCount    = 0
         self._v_failTime     = None
 
-        self.last = None
+        self._v_lastUpdate = None
 
-    def update(self, data=None):
+
+    def update(self, data=None, force=None):
         """update a channel with new data"""
-        self.last = DateTime()
+        self._v_lastUpdate = DateTime()
         if data:
             # Parse what we can from the data,
             # esp. the syn: info
             info, data = data
             try:
-                updateBase      = DateTime(info.get('updateBase'))
+                self._v_updateBase      = DateTime(info.get('updateBase'))
             except:
-                self.updateBase = self.last
+                self._v_updateBase = self._v_lastUpdate
 
             #For now I let this get overridden by the channel, but it should
             #be the otherway prolly
-            self.updatePeriod    = info.get('updatePeriod', self.updatePeriod)
-            self.updateFrequency = int(info.get('updateFrequency', self.updateFrequency))
-            self.title           = info.get('title', self.id)
+            if force:
+                period = info.get('updatePeriod', self.updatePeriod)
+                if period != self.updatePeriod:
+                    self.updatePeriod  = period
+                freq = int(info.get('updateFrequency', self.updateFrequency))
+                if freq != self.updateFrequency:
+                    self.updateFrequency = freq
+                title = info.get('title', self.id)
+                if title != self.title:
+                    self.title = title
 
     def failed(self):
         """set a channel failure"""
@@ -67,15 +76,26 @@ class Channel(SimpleItem):
 
     def nextUpdateSeconds(self):
         """The next update"""
-        if self.last:
-            last = self.last.timeTime()
-        else:
-            last = 0
+        last = self.lastUpdateSeconds()
 
         #Find if we exceeded the delta
         seconds = self.updateFrequency * TIME_SCALE[self.updatePeriod]
 
         return seconds + last
+
+    def lastUpdate(self):
+        """last update time"""
+        last = 0
+        if hasattr(aq_base(self), '_v_lastUpdate'):
+            last = self._v_lastUpdate.timeTime()
+        if last == 0:
+            aged = self.updateFrequency * TIME_SCALE[self.updatePeriod] + 30
+            self._v_lastUpdate = DateTime(DateTime().timeTime() - aged)
+            last = self._v_lastUpdate.timeTime()
+        return DateTime(last)
+
+    def lastUpdateSeconds(self):
+        return self.lastUpdate().timeTime()
 
     def nextUpdate(self):
         """next update time"""
@@ -85,7 +105,7 @@ class Channel(SimpleItem):
         #Check if the channel is down
         now  = DateTime().timeTime()
 
-        if not hasattr(self, '_v_failCount'):
+        if not hasattr(aq_base(self), '_v_failCount'):
             self._v_failCount = 0
             self._v_failTime  = None
 

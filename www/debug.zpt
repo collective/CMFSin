@@ -6,18 +6,17 @@
 	    clear: both;
 	    padding-top: 10px;
 	    }
-	    
+
 	    .cell {
             margin-right:1em;
-            }	    
+            }
 
 	  </style>
-	  
-	  <form action="manage_debug" method="POST" 
+
+	  <form action="manage_debug" method="POST"
 		tal:define="sin here/sin_tool;
 	  maps sin/Maps;
-	  channels sin/Channels;
-		    ">
+	  channels sin/Channels">
 
 	<h2>Channels</h2>
 	<div tal:repeat="c channels">
@@ -25,11 +24,11 @@
 		<br/>
 		<div style="padding: 2px; margin-left: 2em;">
 			<span class="cell" tal:content="c/uri"/><br/>
-			<span class="cell" tal:content="c/last"/>
+			<span class="cell" tal:content="c/lastUpdate|nothing"/>
 			<span class="cell" tal:content="c/nextUpdate"/>
 		</div>
 	</div>
-	
+
 	<h2>Maps</h2>
 	<div tal:repeat="m maps">
 	    <input type="checkbox" name="maps:list" tal:attributes="value m/id;"/>
@@ -57,11 +56,11 @@
 	      </ol>
 	      <hr/>
 	  </div>
-	  
 
-	  
-	  
+
+
+
 	</form>
-	
+
     </body>
     <div tal:replace="structure here/manage_page_footer"/>

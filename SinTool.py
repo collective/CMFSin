@@ -41,11 +41,8 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
     _actions = [ActionInformation(
         id='newfeeds'
         , title='NewsFeeds'
-        , action=Expression(
-        text='string: ${portal_url}/sin_tool/sincfg')
-        ,condition=Expression(
-        text='member')
-#        , permissions=(ManageNewsFeeds,)
+        , action=Expression(text='string: ${portal_url}/sin_tool/sincfg')
+        , condition=Expression(text='member')
         , permissions=(ManagePortal,)
         , category='portal_tabs'
         , visible=0
@@ -70,7 +67,7 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
 
     def _reset(self, config=None):
         self.maps     = OOBTree()
-        self.data     = OOBTree()
+        self._v_data     = OOBTree()
         self.channels = OOBTree()
         self.config   = config
 
@@ -97,7 +94,9 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
             channel.update(data)
             # Lastly, we update the existing data
             # if everything worked
-            self.data[channel.id] = data
+            if not hasattr(aq_base(self), '_v_data'):
+                self._v_data = OOBTree()
+            self._v_data[channel.id] = data
         except (IOError, OSError):
             channel.failed()
 
@@ -110,7 +109,7 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
             self._update(channel)
 
     security.declareProtected(View, 'sin')
-    def sin(self, map, force=0, max_size=None):
+    def sin(self, map_name, force=0, max_size=None):
         """
         Returns the syndication info for a given mapping
         force    -- force a channel update
@@ -118,8 +117,8 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
         """
 
         # With a fallback to channel for development
-        map = self.maps.get(map)
-        if not map: map = self.channels[map]
+        map = self.maps.get(map_name)
+        if not map: map = self.channels[map_name]
 
         for ci in map.Channels():
             enabled = ci['enabled']
@@ -131,12 +130,15 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
         results = []
         links   = {}
 
+        if not hasattr(aq_base(self), '_v_data'):
+            self._v_data = OOBTree()
+
         for ci in map.Channels():
             enabled = ci['enabled']
             if not enabled: continue
             channel = ci['channel']
             priority = ci['priority']
-            data = self.data.get(channel.id, None)
+            data = self._v_data.get(channel.id, None)
             final   = []
 
             if not data: continue
@@ -222,14 +224,14 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
                 c = self.channels[c]
                 m.addChannel(c, priority=pri)
 
-
         file.seek(0)
         self.config = file.read()
 
     security.declarePrivate('load')
     def load(self, filename):
         """ Load a file into config """
-        name = os.path.join(package_home(globals()), os.path.basename(filename))
+        name = os.path.join(package_home(globals()), \
+                            os.path.basename(filename))
         if not name.endswith('.cfg'):
             name += '.cfg'
 
@@ -239,7 +241,8 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
     security.declarePrivate('save')
     def save(self, filename):
         """ Write config into a file """
-        name = os.path.join(package_home(globals()), os.path.basename(filename))
+        name = os.path.join(package_home(globals()), \
+                            os.path.basename(filename))
         if not name.endswith('.cfg'):
             name += '.cfg'
 
@@ -253,10 +256,12 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
         self.parse(config)
 
         if REQUEST:
-            return REQUEST.RESPONSE.redirect(self.absolute_url() + "/sincfg?portal_status_message=Config+Updated")
+            return REQUEST.RESPONSE.redirect(self.absolute_url() + \
+                                             "/sincfg?portal_status_message=Config+Updated")
 
     security.declareProtected(ManagePortal, 'manage_configSin')
-    def manage_configSin(self, submit, config='', filename='', REQUEST=None, **kwargs):
+    def manage_configSin(self, submit, config='', filename='', \
+                         REQUEST=None, **kwargs):
         """config this puppy"""
         if submit == "Set Config":
             self.parse(config)
@@ -266,7 +271,8 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
             self.save(filename)
 
         if REQUEST:
-            return REQUEST.RESPONSE.redirect(self.absolute_url() + "/manage_workspace")
+            return REQUEST.RESPONSE.redirect(self.absolute_url() + \
+                                             "/manage_workspace")
 
     security.declareProtected(ManagePortal, 'manage_debug')
     def manage_debug(self, submit, maps=(),  REQUEST=None, *args, **kwargs):
@@ -280,7 +286,8 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
                 self.sin(id, force=1)
 
         if REQUEST:
-            return REQUEST.RESPONSE.redirect(self.absolute_url() + "/manage_workspace")
+            return REQUEST.RESPONSE.redirect(self.absolute_url() + \
+                                             "/manage_workspace")
 
     security.declarePrivate('setCurrentFeed')
     def setCurrentFeed(self, name):
@@ -316,7 +323,8 @@ class SinMacro:
 
     def __repr__(self):
         return '<SinMacro at %s template: %s, macro: %s, maps: %s>' % \
-               (id(self), self._template, self._macro, ','.join(self._sintool.maps.keys()))
+               (id(self), self._template, self._macro, \
+                ','.join(self._sintool.maps.keys()))
 
     def __getattr__(self, key):
         if key in self.__dict__.keys():
