@@ -8,12 +8,14 @@
 
 <!-- The a sin box row -->
 
-<div metal:define-macro="sinRow" tal:define="r row">
-      <div class="content">
-      <a href="#"  tal:attributes="href r/link" tal:content="r/title"/>&nbsp;      <span tal:condition="python: r.get('date') or nothing" tal:content="python: here.toPortalTime(r['date']);"/><br/>
-      <span tal:condition="python: verbose and r.get('description') or nothing" tal:replace="structure r/description"/>
+    <div metal:define-macro="sinRow" tal:define="r row">
+      <div class="content" 
+	tal:define="oddrow repeat/row/odd"
+	tal:attributes="class python:test(oddrow, 'content even', 'content odd')">
+	<a href="#"  tal:attributes="href r/link" tal:content="r/title"/>&nbsp;      <span tal:condition="python: r.get('date') or nothing" tal:content="python: here.toPortalTime(r['date']);"/><br/>
+	      <span tal:condition="python: verbose and r.get('description') or nothing" tal:replace="structure r/description"/>
       </div>
-</div>
+    </div>
 
 
     <div metal:define-macro="sinBox" 
@@ -23,15 +25,19 @@
                   verbose verbose | false;
                   max max_size | default_max;
                   sin here/sin_tool;
+                  m m | request/map;
                   rows python:sin.sin(m, max_size=max)">
-      <span class="boxTitle" tal:content="m"/>
-	<div class="box" tal:repeat="row rows">
-	  <div metal:use-macro="here/sinBox/macros/sinRow">
-	    <metal:block metal:fill-slot="row"/>
-	  </div>
-	</div>
-</div>
 
+      
+	<span class="boxTitle" tal:content="m"/>
+	<div class="box">
+	  <div tal:repeat="row rows">
+	    <div metal:use-macro="here/sinBox/macros/sinRow">
+	      <metal:block metal:fill-slot="row"/>
+	    </div>
+	  </div>
+      </div>
+    </div>
 </body>
 
 </html>
