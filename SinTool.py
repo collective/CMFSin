@@ -273,8 +273,8 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
         """ Get the feed """
         fd = self._v_current_feed
         if fd.startswith('map_'):
-            fd = fd[5:]
-            if not self.map.has_key(fd):
+            fd = fd[4:]
+            if not self.maps.has_key(fd):
                 raise ValueError, "'%s' is not a valid map" % fd
             # found a map
             return fd[5:]
