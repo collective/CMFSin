@@ -24,6 +24,14 @@ schedRe = re.compile("(?P<freq>\d+)(?P<period>h|d|w|m|y):")
 #ManageNewsFeeds = "Manage News Feeds"
 #CMFCorePermissions.setDefaultRoles(ManageNewsFeeds, ('Manager',))
 
+_parsers = {}
+
+def registerParser(channel, parser):
+    _parsers[channel] = parser
+
+def lookupParser(channel, default=parse):
+    return _parsers.get(channel, default)
+
 class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
     """ CMF Syndication Client  """
     id        = 'sin_tool'
@@ -74,7 +82,8 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
     def _update(self, channel):
         # Hard update of a channels feed -> data
         try:
-            data = parse(channel.uri)
+            parser = lookupParser(channel.id)
+            data = parser(channel.uri)
             channel.update(data)
             # Lastly, we update the existing data
             # if everything worked
