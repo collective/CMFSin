@@ -50,22 +50,22 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
     
     def _update(self, channel):
         # Hard update of a channels feed -> data
-        data = self.data.get(channel.id, ())
         try:
             data = parse(channel.uri)
             channel.update(data)
+            # Lastly, we update the existing data
+            # if everything worked
             self.data[channel.id] = data
         except (IOError, OSError):
             channel.failed()
         
-        return data
     
     def updateChannel(self, channel, force=0):
         if not isinstance(channel, Channel):
             channel = self.channels[channel]
 
         if force == 1 or channel.requireUpdate():
-            data = self._update(channel)
+            self._update(channel)
 
     def sin(self, map, force=0, max_size=None):
         """Returns the syndication info for a given mapping
