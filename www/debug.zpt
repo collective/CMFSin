@@ -1,0 +1,68 @@
+    <div tal:replace="structure here/manage_page_header"/>
+      <body bgcolor="#ffffff" link="#000099" alink="#000099" vlink="#000099">
+	<div tal:replace="structure here/manage_tabs"/>
+	  <style type="text/css">
+	    div.row {
+	    clear: both;
+	    padding-top: 10px;
+	    }
+	    
+	    .cell {
+            margin-right:1em;
+            }	    
+
+	  </style>
+	  
+	  <form action="manage_debug" method="POST" 
+		tal:define="sin here/sin_tool;
+	  maps sin/Maps;
+	  channels sin/Channels;
+		    ">
+
+	<h2>Channels</h2>
+	<div tal:repeat="c channels">
+		<b tal:content="c/title"/>
+		<br/>
+		<div style="padding: 2px; margin-left: 2em;">
+			<span class="cell" tal:content="c/uri"/><br/>
+			<span class="cell" tal:content="c/updatePeriod"/>
+			<span class="cell" tal:content="c/updateFrequency"/>
+			<span class="cell" tal:content="c/updateBase"/>
+		</div>
+	</div>
+	
+	<h2>Maps</h2>
+	<div tal:repeat="m maps">
+	    <input type="checkbox" name="maps:list" tal:attributes="value m/id;"/>
+		<span tal:content="m/id"/> ::
+		<span tal:content="m/channels"/>
+	</div>
+
+	  <div class="form-element">
+	    <input class="form-element" type="submit" name="submit"
+		   value="Update Maps">
+	  </div>
+
+	  <div class="form-element">
+	    <input class="form-element" type="submit" name="submit"
+		   value="Purge">
+	  </div>
+
+	<h2>Data</h2>
+	  <div tal:repeat="m maps">
+	    <h3 tal:content="m/id"/>
+	      <ol>
+	        <li tal:repeat="r python:sin.sin(m.id)"><a href="#"  tal:attributes="href r/link" tal:content="r/title"/><br/>
+		      <span tal:condition="r/description |nothing" tal:replace="structure r/description"/>
+	</li>
+	      </ol>
+	      <hr/>
+	  </div>
+	  
+
+	  
+	  
+	</form>
+	
+    </body>
+    <div tal:replace="structure here/manage_page_footer"/>

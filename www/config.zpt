@@ -1,0 +1,52 @@
+    <div tal:replace="structure here/manage_page_header"/>
+      <body bgcolor="#ffffff" link="#000099" alink="#000099" vlink="#000099">
+	<div tal:replace="structure here/manage_tabs"/>
+	  <style type="text/css">
+	    div.row {
+	    clear: both;
+	    padding-top: 10px;
+	    }
+	    
+	    div.row span.cell {
+	    float: left;
+	    text-align: right;
+	    }
+	    
+	    div.row span.label {
+	    font-weight: bold;
+	    }
+	  </style>
+	  
+	  <form action="manage_configSin" method="POST"
+	tal:define="sin here/sin_tool;	
+	cfg request/config | sin/config | nothing"
+	>
+	
+	<div class="form-help">
+	The config file for the Sin Tool
+    </div>
+    <div class="form-label">
+    Config
+    </div>
+    <textarea name="config:text" cols=80 rows=20 tal:content="cfg"></textarea>
+
+    <div class="form-element">
+    <input class="form-element" type="submit" name="submit"
+     value="Set Config"/>
+	</div>
+
+<hr/>
+	
+<input type="text" name="filename"/>
+    <div class="form-element">
+    <input class="form-element" type="submit" name="submit" value="Import"/>
+
+    <input class="form-element" type="submit" name="submit" value="Export"/>
+	
+    </div>
+
+	
+	</form>
+
+      </body>
+      <div tal:replace="structure here/manage_page_footer"/>
