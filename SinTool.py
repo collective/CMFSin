@@ -3,7 +3,9 @@ from BTrees.OOBTree import OOBTree
 from ConfigParser import ConfigParser
 from Globals import InitializeClass, package_home
 from OFS.SimpleItem import SimpleItem
+from Products.CMFCore.Expression import Expression
 from Products.CMFCore  import CMFCorePermissions
+from Products.CMFCore.ActionInformation import ActionInformation
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.utils import UniqueObject, getToolByName
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
@@ -19,11 +21,28 @@ from OrderPolicy import listPolicies
 
 schedRe = re.compile("(?P<freq>\d+)(?P<period>h|d|w|m|y):")
 
+#ManageNewsFeeds = "Manage News Feeds"
+#CMFCorePermissions.setDefaultRoles(ManageNewsFeeds, ('Manager',))
+
 class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
     """ CMF Syndication Client  """
     id        = 'sin_tool'
     meta_type = 'CMFSin Syndication Tool'
+
+    _actions = [ActionInformation(
+        id='newfeeds'
+        , title='NewsFeeds'
+        , action=Expression(
+        text='string: ${portal_url}/sin_tool/sincfg')
+        ,condition=Expression(
+        text='member') 
+#        , permissions=(ManageNewsFeeds,)
+        , permissions=(CMFCorePermissions.ManagePortal,)
+        , category='portal_tabs'
+        , visible=1
+        )]
     
+
 
     manage_options=(
         ({ 'label'   : 'Config',
@@ -33,7 +52,7 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
             'action' : 'manage_debugForm',
             },
          ) + SimpleItem.manage_options
-
+        +  ActionProviderBase.manage_options
         )
 
     manage_debugForm = PageTemplateFile('www/debug', globals())
@@ -206,6 +225,12 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
         fp.close()
         
         
+    def updateConfig(self, config=None, REQUEST=None, *args):
+        """Update the config using new info"""
+        self.parse(config)
+
+        if REQUEST:
+            return REQUEST.RESPONSE.redirect(self.absolute_url() + "/sincfg?portal_status_message=Config+Updated")
         
     def manage_configSin(self, submit, config='', filename='', REQUEST=None, **kwargs):
         """config this puppy"""

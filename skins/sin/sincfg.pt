@@ -1,3 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US"
+      lang="en-US"
+      metal:use-macro="here/main_template/macros/master"
+      i18n:domain="plone">
+      
+<body>
+
+   <div metal:fill-slot="main" 
+      tal:define="rejection here/rejectAnonymous;
+      sin here/sin_tool;	
+      cfg request/config | sin/config | nothing;
+      Iterator python:modules['Products.CMFPlone'].IndexIterator;
+      tabindex python:Iterator();">
+      
+	  <form action="updateConfig" method="POST">
+
+
+	<div class="form-help">
+	The config file for the Sin Tool
+    </div>
+    <div class="form-label">
+    Config
+    </div>
+    <textarea name="config:text" cols=80 rows=20 tal:content="cfg"></textarea>
+
+    <div class="form-element">
+    <input class="form-element" type="submit" name="submit"
+     value="Set Config"/>
+	</div>
+
+	
+	</form>
+    <pre>
 Currently we use a very simple config file: This will have to change
 as we really want to be able to talk about thigns like manually
 controlled syn intervals and such.
@@ -33,3 +67,10 @@ channel names. If you start the list with a name followed by a ':'
 then you can specify a policy for ordering the data in the channel. At
 the time of this writing 'simple' and 'random' are provided as examples.
 
+
+    </pre>
+
+    </div>
+
+      </body>
+</html>

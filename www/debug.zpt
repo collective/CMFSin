@@ -25,9 +25,8 @@
 		<br/>
 		<div style="padding: 2px; margin-left: 2em;">
 			<span class="cell" tal:content="c/uri"/><br/>
-			<span class="cell" tal:content="c/updatePeriod"/>
-			<span class="cell" tal:content="c/updateFrequency"/>
-			<span class="cell" tal:content="c/updateBase"/>
+			<span class="cell" tal:content="c/last"/>
+			<span class="cell" tal:content="c/nextUpdate"/>
 		</div>
 	</div>
 	

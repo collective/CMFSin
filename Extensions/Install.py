@@ -1,6 +1,7 @@
 from Products.CMFSin import sin_globals
 from StringIO import StringIO
 from Products.CMFCore.utils import getToolByName
+from Products.CMFCore.DirectoryView import addDirectoryViews
 
 SKIN_NAME = "sin"
 _globals = globals()
@@ -10,6 +11,9 @@ def install_tools(self, out):
         addTool = self.manage_addProduct['CMFSin'].manage_addTool
         addTool('CMFSin Syndication Tool')
 
+def install_actions(self, out):
+    at = getToolByName(self, "portal_actions")
+    at.manage_aproviders('sin_tool', add_provider=1)
 
 def install_subskin(self, out, skin_name=SKIN_NAME, globals=sin_globals):
     skinstool=getToolByName(self, 'portal_skins')
@@ -34,6 +38,7 @@ def install(self):
     print >>out, "Installing CMFSin"
     
     install_tools(self, out)
+    install_actions(self, out)
     install_subskin(self, out)
     
     return out.getvalue()

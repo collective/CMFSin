@@ -10,7 +10,7 @@
 
 <div metal:define-macro="sinRow" tal:define="r row">
       <div class="content">
-      <a href="#"  tal:attributes="href r/link" tal:content="r/title"/><br/>
+      <a href="#"  tal:attributes="href r/link" tal:content="r/title"/>&nbsp;      <span tal:condition="python: r.get('date') or nothing" tal:content="python: here.toPortalTime(r['date']);"/><br/>
       <span tal:condition="python: verbose and r.get('description') or nothing" tal:replace="structure r/description"/>
       </div>
 </div>
