@@ -84,6 +84,8 @@ class Channel(SimpleItem):
 
     def requireUpdate(self):
         #Check if the channel is down
+        now  = DateTime().timeTime()
+
         if not hasattr(self, '_v_failCount'):
             self._v_failCount = 0
             self._v_failTime  = None
@@ -92,10 +94,7 @@ class Channel(SimpleItem):
             if self._v_failTime < now:
                 self.clear()
         
-
-        now  = DateTime().timeTime()
-        next = self.nextUpdateSeconds()
-        if next < now:
+        if self.nextUpdateSeconds() < now:
             return 1
         return 0
         

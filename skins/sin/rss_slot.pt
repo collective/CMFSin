@@ -9,9 +9,9 @@
     <!-- Example of how to define fun macros for rss news boxes usings -->
     <!-- sinBox -->
     <div metal:define-macro="geek_box" 
-      tal:define="m string:geek; 
+      tal:define="m string:internal; 
       verbose python: 0;
-      max_size python: 5">
+      max_size python: 10">
       <div metal:use-macro="here/sinBox/macros/sinBox"/>
       </div>
       
