@@ -1,0 +1,23 @@
+Source: zope-cmfsin
+Section: web
+Priority: optional
+Maintainer: Sylvain Thenault <sylvain.thenault@logilab.fr> 
+Build-Depends: debhelper (>= 3.0.0) 
+Standards-Version: 3.5.8
+
+Package: zope-cmfsin
+Architecture: all
+Depends: zope, zope-cmf
+Description: a simple syndication client for CMF [dummy package]
+ This is a simple syndication client for CMF. It uses rssparser and
+ shares many things in common with CMFNewsFeed but has a different
+ model for handling channels. It is designed to map _n_ channels or
+ feeds to sets of composite virtual channels which can then be called
+ in in a timely fashion. Most of the remaining work has to happen in UI
+ land.
+ .
+ .
+ This package is an empty dummy package that always depends on
+ a package built for Debian's default Python version.
+
+
