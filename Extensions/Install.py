@@ -44,3 +44,7 @@ def install(self):
     return out.getvalue()
 
 
+def uninstall(self):
+    at = getToolByName(self, "portal_actions")
+    at.deleteActionProvider('sin_tool')
+
