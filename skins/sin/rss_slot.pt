@@ -11,7 +11,7 @@
     <div metal:define-macro="geek_box" 
       tal:define="m string:internal; 
       verbose python: 0;
-      max_size python: 10">
+      max_size python: 5">
       <div metal:use-macro="here/sinBox/macros/sinBox"/>
       </div>
       
