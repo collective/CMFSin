@@ -11,17 +11,17 @@ class Map(SimpleItem):
 
     def setPolicy(self, name):
         self.policy = lookupPolicy(name, defaultPolicy)
-        
+
     def setPriority(self, channel, pri):
         if not isinstance(channel, Channel):
             id = channel.id
         else:
             id = channel
-            
+
         channel = self.channels[id]
         channel['priority'] = int(pri)
-        
-        
+
+
     def addChannel(self, channel, **kwargs):
         enabled  = kwargs.get('enabled', 1)
         priority = kwargs.get('priority', 0)
@@ -30,12 +30,11 @@ class Map(SimpleItem):
                                      'enabled' : enabled,
                                      'priority': priority,
                                      }
-
     def Channels(self):
         return self.channels.values()
 
-    
-        
-        
-    
-    
+
+
+
+
+

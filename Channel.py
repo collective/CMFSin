@@ -66,7 +66,7 @@ class Channel(SimpleItem):
     def failed(self):
         """set a channel failure"""
         if self._v_failCount == FAIL_THRESHOLD:
-            self._v_failTime = DateTime().timeTime() + FAIL_DELAY
+            self._v_failTime = DateTime(DateTime().timeTime() + FAIL_DELAY)
         self._v_failCount += 1
 
     def clear(self):
@@ -77,19 +77,22 @@ class Channel(SimpleItem):
     def nextUpdateSeconds(self):
         """The next update"""
         last = self.lastUpdateSeconds()
+        delta = self.updateFrequency * TIME_SCALE[self.updatePeriod]
+        next = last + delta
+        if hasattr(aq_base(self), '_v_failTime') and self._v_failTime:
+            fail = self._v_failTime.timeTime()
+            next = (cmp(fail, next) < 0) and fail or next
+            print last, next, fail
 
-        #Find if we exceeded the delta
-        seconds = self.updateFrequency * TIME_SCALE[self.updatePeriod]
-
-        return seconds + last
+        return next
 
     def lastUpdate(self):
         """last update time"""
         last = 0
-        if hasattr(aq_base(self), '_v_lastUpdate'):
+        if hasattr(aq_base(self), '_v_lastUpdate') and self._v_lastUpdate:
             last = self._v_lastUpdate.timeTime()
         if last == 0:
-            aged = self.updateFrequency * TIME_SCALE[self.updatePeriod] + 30
+            aged = self.updateFrequency * TIME_SCALE[self.updatePeriod] + 300
             self._v_lastUpdate = DateTime(DateTime().timeTime() - aged)
             last = self._v_lastUpdate.timeTime()
         return DateTime(last)

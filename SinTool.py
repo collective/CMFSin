@@ -13,6 +13,7 @@ from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.utils import UniqueObject, getToolByName
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from StringIO import StringIO
+from Acquisition import aq_base
 from ComputedAttribute import ComputedAttribute
 
 from Map import Map
@@ -86,12 +87,12 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
         """ Available Policies """
         return listPolicies()
 
-    def _update(self, channel):
+    def _update(self, channel, force=None):
         # Hard update of a channels feed -> data
         try:
             parser = lookupParser(channel.id)
             data = parser(channel.uri)
-            channel.update(data)
+            channel.update(data, force)
             # Lastly, we update the existing data
             # if everything worked
             if not hasattr(aq_base(self), '_v_data'):
@@ -101,12 +102,12 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
             channel.failed()
 
     security.declareProtected(View, 'updateChannel')
-    def updateChannel(self, channel, force=0):
+    def updateChannel(self, channel, force=None):
         if not isinstance(channel, Channel):
             channel = self.channels[channel]
 
-        if force == 1 or channel.requireUpdate():
-            self._update(channel)
+        if force or channel.requireUpdate():
+            self._update(channel, force)
 
     security.declareProtected(View, 'sin')
     def sin(self, map_name, force=0, max_size=None):
@@ -116,24 +117,36 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
         max_size -- max size of result set (may be used in policy to calc pri)
         """
 
+        if not hasattr(aq_base(self), '_v_data'):
+            self._v_data = OOBTree()
+
         # With a fallback to channel for development
         map = self.maps.get(map_name)
-        if not map: map = self.channels[map_name]
+        if not map:
+            map = self.channels[map_name]
+            channels = (map, )
+        else:
+            channels = map.Channels()
 
-        for ci in map.Channels():
+        for ci in channels:
             enabled = ci['enabled']
             if not enabled: continue
             channel = ci['channel']
             self.updateChannel(channel, force)
 
+# How safe is it to use threading inside Zope?
+#             import threading
+#             thread_name = "SinTool.Channel.%s" % channel.id
+#             if not [t for t in threading.enumerate() if \
+#                     t.getName() == thread_name]:
+#                 threading.Thread(target=self.updateChannel, name=thread_name, \
+#                                  args=(channel, force)).start()
+
         #Collect all the data for all the enabled channels now
         results = []
         links   = {}
 
-        if not hasattr(aq_base(self), '_v_data'):
-            self._v_data = OOBTree()
-
-        for ci in map.Channels():
+        for ci in channels:
             enabled = ci['enabled']
             if not enabled: continue
             channel = ci['channel']

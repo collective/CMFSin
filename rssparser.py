@@ -37,6 +37,7 @@ try:
     timeoutsocket.setDefaultSocketTimeout(10)
 except ImportError:
     pass
+
 import sgmllib, re, cgi, string
 sgmllib.tagfind = re.compile('[a-zA-Z][-_.:a-zA-Z0-9]*')
 import urllib
@@ -66,6 +67,7 @@ class RSSParser(sgmllib.SGMLParser):
                   "http://purl.org/rss/1.0/modules/company/": "co",
                   "http://purl.org/rss/1.0/modules/syndication/": "sy",
                   "http://purl.org/dc/elements/1.1/": "dc"}
+
     def reset(self):
         self.channel = {}
         self.items = []
@@ -114,7 +116,7 @@ class RSSParser(sgmllib.SGMLParser):
     def end_sy_updateperiod(self):
         self.pop('updatePeriod')
     end_updateperiod = end_sy_updateperiod
-    
+
     def start_sy_updatefrequency(self, attrs):
         self.push('updateFrequency', 1)
     start_updatefrequency = start_sy_updatefrequency
@@ -139,7 +141,7 @@ class RSSParser(sgmllib.SGMLParser):
     def end_dc_language(self):
         self.pop('language')
     end_language = end_dc_language
-    
+
     def start_dc_creator(self, attrs):
         self.push('creator', 1)
     start_managingeditor = start_dc_creator
@@ -149,7 +151,7 @@ class RSSParser(sgmllib.SGMLParser):
         self.pop('creator')
     end_managingeditor = end_dc_creator
     end_webmaster = end_dc_creator
-    
+
     def start_dc_rights(self, attrs):
         self.push('rights', 1)
     start_copyright = start_dc_rights
@@ -197,7 +199,7 @@ class RSSParser(sgmllib.SGMLParser):
     def end_content_encoded(self):
         self.pop('content_encoded')
     end_fullitem = end_content_encoded
-        
+
     def unknown_starttag(self, tag, attrs):
         self._addNamespaces(attrs)
         colonpos = tag.find(':')
@@ -214,7 +216,7 @@ class RSSParser(sgmllib.SGMLParser):
             except AttributeError:
                 return self.push(prefix + suffix, 1)
         return self.push(tag, 0)
-        
+
     def unknown_endtag(self, tag):
         colonpos = tag.find(':')
         if colonpos <> -1:
@@ -236,7 +238,7 @@ class RSSParser(sgmllib.SGMLParser):
         # Reconstruct the original character reference.
         if not self.elementstack: return
         self.elementstack[-1][2].append("&#%(ref)s;" % locals())
-        
+
     def handle_entityref(self, ref):
         # called for each entity reference, e.g. for "&copy;", ref will be "copy"
         # Reconstruct the original entity reference.
@@ -248,11 +250,11 @@ class RSSParser(sgmllib.SGMLParser):
         # not containing any character or entity references
         if not self.elementstack: return
         self.elementstack[-1][2].append(text)
-        
+
     def handle_comment(self, text):
         # called for each comment, e.g. <!-- insert message here -->
         pass
-        
+
     def handle_pi(self, text):
         # called for each processing instruction, e.g. <?instruction>
         pass
@@ -322,7 +324,7 @@ def parse_all(uris):
             pass
     return res
 
-        
+
 
 TEST_SUITE = ('http://www.pocketsoap.com/rssTests/rss1.0withModules.xml',
               'http://www.pocketsoap.com/rssTests/rss1.0withModulesNoDefNS.xml',
@@ -345,4 +347,4 @@ if __name__ == '__main__':
         print k
         pprint (v[0])
         pprint (v[1])
-    
+
