@@ -1,5 +1,7 @@
 import os, os.path
 import re
+import locale
+from types import StringType, UnicodeType
 
 from AccessControl import ClassSecurityInfo
 from BTrees.OOBTree import OOBTree
@@ -30,6 +32,36 @@ def registerParser(channel, parser):
 
 def lookupParser(channel, default=parse):
     return _parsers.get(channel, default)
+
+def udecode(data, encoding='ascii'):
+    if (encoding and encoding.lower() == 'unicode'
+        or isinstance(data, UnicodeType)):
+        return unicode(data)
+    encodings = [encoding, 'utf-8']
+    try:
+        encodings.append(locale.nl_langinfo(locale.CODESET))
+    except:
+        pass
+    try:
+        encodings.append(locale.getlocale()[1])
+    except:
+        pass
+    try:
+        encodings.append(locale.getdefaultlocale()[1])
+    except:
+        pass
+    encodings.append('latin-1')
+    for enc in encodings:
+        if not enc:
+            continue
+        try:
+            return unicode(data, enc)
+        except (UnicodeError, LookupError):
+            pass
+    raise UnicodeError(
+        'Unable to decode input data.  Tried the following encodings: %s.'
+        % ', '.join([repr(enc) for enc in encodings if enc]))
+
 
 class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
     """ CMF Syndication Client  """
@@ -87,11 +119,33 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
         """ Available Policies """
         return listPolicies()
 
+    def encode(self, parsed_data):
+        # Get site encoding
+
+        enc = 'iso8859-1'
+        try:
+            pp = getToolByName(self, 'portal_properties')
+            enc = getattr(pp.site_properties, 'default_charset', 'iso8859-1')
+        except (AttributeError, KeyError):
+            pass
+        info, data = parsed_data
+        if info.has_key('title'):
+            if type(info['title']) not in (UnicodeType, ):
+                info['title'] = udecode(info['title']).encode(enc)
+        if info.has_key('description'):
+            if type(info['description']) not in (UnicodeType, ):
+                info['description'] = udecode(info['description']).encode(enc)
+        for r in data:
+            if r.has_key('title'):
+                if type(r['title']) not in (UnicodeType, ):
+                    r['title'] = udecode(r['title']).encode(enc)
+        return info, data
+
     def _update(self, channel, force=None):
         # Hard update of a channels feed -> data
         try:
             parser = lookupParser(channel.id)
-            data = parser(channel.uri)
+            data = self.encode(parser(channel.uri))
             channel.update(data, force)
             # Lastly, we update the existing data
             # if everything worked
