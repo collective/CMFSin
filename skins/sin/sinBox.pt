@@ -7,23 +7,22 @@
 <body>
 
 <!-- The a sin box row -->
-    <div metal:define-macro="sinBox" 
-      tal:define="default_max python: 10;
+    <div metal:define-macro="sinBox" tal:on-error="string:"
+      		tal:define="default_max python: 10;
                   true python: 1;
                   false python: 0;
                   verbose verbose | false;
                   max max_size | default_max;
                   sin here/sin_tool;
-                  m options/m | request/map | here/sin_tool/get_current_feed;
-                  rows python:sin.sin(m, max_size=max)">
+                  map options/map | request/map | here/sin_tool/get_current_feed;
+                  rows python:sin.sin(map, max_size=max)">
 
-      
 
 	<div class="box">
-	<h5 tal:content="m"/>
+	<h5 tal:content="map"/>
 	  <div class="body">
 	    <div tal:repeat="row rows">
-	       <div class="content" 
+	       <div class="content"
 			tal:define="oddrow repeat/row/odd"
 			tal:attributes="class python:test(oddrow, 'content even', 'content odd')">
 			<a href="#"  tal:attributes="href row/link" tal:content="row/title"/>&nbsp;
@@ -31,7 +30,7 @@
 			<span tal:condition="python: verbose and row.get('description') or nothing" tal:replace="structure row/description"/>
 	      </div>
 	    </div>
-	  &nbsp;&nbsp;&nbsp;...<a  tal:attributes="href  python:'sinList?synmap=%s' % m" i18n:translate="complete_list">Complete List</a>
+	  &nbsp;&nbsp;&nbsp;...<a  tal:attributes="href  python:'sinList?synmap=%s' % map" i18n:translate="complete_list">Complete List</a>
         </div>         
       </div>
     </div>
