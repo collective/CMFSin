@@ -11,11 +11,6 @@
       <div metal:use-macro="here/sinBox/macros/sinBox"/>
     </tal:block>
 
-    <hr>
-    <address><a href="mailto:bcsaller@yahoo.com">Benjamin Saller</a></address>
-<!-- Created: Thu Oct 31 00:39:29 EST 2002 -->
-<!-- hhmts start -->
-Last modified: Thu Oct 31 00:58:47 EST 2002
-<!-- hhmts end -->
+
   </body>
 </html>
