@@ -23,9 +23,11 @@
 	       <div class="content"
 			tal:define="oddrow repeat/row/odd"
 			tal:attributes="class python:test(oddrow, 'content even', 'content odd')">
-			<a href="#"  tal:attributes="href row/link" tal:content="row/title"/>&nbsp;
-			<span tal:condition="python: row.get('date') or nothing" tal:content="python: here.toPortalTime(row['date'])" /><br/>
-			<span tal:condition="python: verbose and row.get('description') or nothing" tal:replace="structure row/description" />
+			<a href="#"  tal:attributes="href row/link" tal:content="structure row/title"/>&nbsp;
+			<span tal:condition="python: row.get('date') or nothing" 
+                tal:content="python: here.toPortalTime(row['date'])" /><br/>
+			<span tal:condition="python: verbose and row.get('description') or nothing" 
+                tal:replace="structure row/description" />
 	      </div>
 	    </div>
 <div class="boxDetails">
