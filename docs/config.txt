@@ -8,7 +8,7 @@ controlled syn intervals and such.
 crackbaby=http://www.crackbaby.com/backend.php
 top=http://headlines.internet.com/internetnews/top-news/news.rss
 web=http://headlines.internet.com/internetnews/wd-news/news.rss
-slashdot=http://headlines.internet.com/internetnews/top-news/news.rss
+slashdot=1h:http://headlines.internet.com/internetnews/top-news/news.rss
 freshmeat=http://freshmeat.net/backend/fm-releases-software.rdf
 
 [maps]
@@ -21,8 +21,12 @@ geek=random:slashdot,freshmeat
 
 channels are the real news feeds, these map to Channel objects. 
 channels are 
-NAME=URI
+NAME=[time]URI
 
+where the optional time spec is
+\d+[hdwmy]:
+
+for example 1d for once a day, or 4h for every 4 hours and then the trailing colon
 
 maps hold n channels where n is 0+ they are a comma delimited list of
 channel names. If you start the list with a name followed by a ':'
