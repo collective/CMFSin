@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      i18n:domain="plone">
+
+<body>
+
+<!-- The a sin box row -->
+
+<div metal:define-macro="sinRow" tal:define="r row">
+      <div class="content">
+      <a href="#"  tal:attributes="href r/link" tal:content="r/title"/><br/>
+      <span tal:condition="python: verbose and r['description'] or 0" tal:replace="structure r/description"/>
+      </div>
+</div>
+
+
+    <div metal:define-macro="sinBox" 
+      tal:define="default_max python: 15;
+                  true python: 1;
+                  false python: 0;
+                  verbose verbose | false;
+                  max max_size | default_max;
+                  sin here/sin_tool;
+                  rows python:sin.sin(m, max_size=max)">
+      <span class="boxTitle" tal:content="m"/>
+	<div class="box" tal:repeat="row rows">
+	  <div metal:use-macro="here/sinBox/macros/sinRow">
+	    <metal:block metal:fill-slot="row"/>
+	  </div>
+	</div>
+</div>
+
+</body>
+
+</html>
+

@@ -1,0 +1,21 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>test</title>
+  </head>
+
+  <body>
+    <h1>test</h1>
+
+    <tal:block tal:define="m string:geek; verbose python: 0;max_size python: 16">
+      <div metal:use-macro="here/sinBox/macros/sinBox"/>
+    </tal:block>
+
+    <hr>
+    <address><a href="mailto:bcsaller@yahoo.com">Benjamin Saller</a></address>
+<!-- Created: Thu Oct 31 00:39:29 EST 2002 -->
+<!-- hhmts start -->
+Last modified: Thu Oct 31 00:58:47 EST 2002
+<!-- hhmts end -->
+  </body>
+</html>
