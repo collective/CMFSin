@@ -205,6 +205,8 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
         elif submit == "Export":
             self.save(filename)
 
+        if REQUEST:
+            return REQUEST.RESPONSE.redirect(self.absolute_url() + "/manage_workspace")
 
     def manage_debug(self, submit, maps=(),  REQUEST=None, *args, **kwargs):
         """update maps for testing"""
@@ -215,6 +217,9 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
         elif submit == "Update Maps":
             for id in maps:
                 self.sin(id, force=1)
+
+        if REQUEST:
+            return REQUEST.RESPONSE.redirect(self.absolute_url() + "/manage_workspace")
 
 
 InitializeClass(SinTool)
