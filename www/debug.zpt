@@ -48,10 +48,10 @@
 	  </div>
 
 	<h2>Data</h2>
-	  <div tal:repeat="m maps">
+	  <div tal:on-error="string:" tal:repeat="m maps">
 	    <h3 tal:content="m/id"/>
 	      <ol>
-	        <li tal:repeat="r python:sin.sin(m.id)"><a href="#"  tal:attributes="href r/link" tal:content="r/title"/><br/>
+	        <li tal:on-error="string:" tal:repeat="r python:sin.sin(m.id)"><a href="#"  tal:attributes="href r/link" tal:content="r/title"/><br/>
 		      <span tal:condition="r/description |nothing" tal:replace="structure r/description"/>
 	</li>
 	      </ol>
