@@ -128,7 +128,8 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
             enc = getattr(pp.site_properties, 'default_charset', 'iso8859-1')
         except (AttributeError, KeyError):
             pass
-        info, data = parsed_data
+        info = parsed_data['channel']
+        data = parsed_data['items']
         if info.has_key('title'):
             if type(info['title']) not in (UnicodeType, ):
                 info['title'] = udecode(info['title']).encode(enc)

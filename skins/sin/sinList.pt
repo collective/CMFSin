@@ -32,7 +32,7 @@
         <div metal:use-macro="here/batch_macros/macros/navigation" />
 
 	<dl tal:repeat="obj batch">
-		<dt><a href="#"  tal:attributes="href obj/link" tal:content="obj/title"/>&nbsp; <span tal:condition="python: obj.get('date') or nothing" tal:content="python: here.toPortalTime(obj['date'])"/></dt>
+		<dt><a href="#"  tal:attributes="href obj/link" tal:content="structure obj/title"/>&nbsp; <span tal:condition="python: obj.get('date') or nothing" tal:content="python: here.toPortalTime(obj['date'])"/></dt>
 		<dd><span tal:condition="python: verbose and obj.get('description') or nothing" tal:replace="structure obj/description"/></dd>
 	</dl>
 
