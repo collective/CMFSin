@@ -12,7 +12,7 @@ slashdot=http://headlines.internet.com/internetnews/top-news/news.rss
 freshmeat=http://freshmeat.net/backend/fm-releases-software.rdf
 
 [maps]
-humor=crackbaby,lame
+humor=crackbaby
 internet=top,web
 geek=random:slashdot,freshmeat
 
