@@ -1,6 +1,6 @@
 from AccessControl import ClassSecurityInfo
 from BTrees.OOBTree import OOBTree
-from ConfigParser import ConfigParser
+from SinConfigParser import ConfigParser
 from Globals import InitializeClass, package_home
 from OFS.SimpleItem import SimpleItem
 from Products.CMFCore.Expression import Expression
@@ -186,6 +186,7 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
 
             channels = channels.split(',')
             for c in channels:
+                c = c.strip()  # remove whitespace around delimitters
                 if c.endswith(')'):
                     #look for channel(pri) format
                     idx = c.rfind('(')
