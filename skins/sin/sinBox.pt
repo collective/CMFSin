@@ -29,11 +29,14 @@
                   rows python:sin.sin(m, max_size=max)">
 
       
-	<span class="boxTitle" tal:content="m"/>
+
 	<div class="box">
-	  <div tal:repeat="row rows">
-	    <div metal:use-macro="here/sinBox/macros/sinRow">
-	      <metal:block metal:fill-slot="row"/>
+	<h5 tal:content="m"/>
+	  <div class="body">
+	    <div tal:repeat="row rows">
+	      <div metal:use-macro="here/sinBox/macros/sinRow">
+		<metal:block metal:fill-slot="row"/>
+	      </div>
 	    </div>
 	  </div>
       </div>
