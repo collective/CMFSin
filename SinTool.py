@@ -277,7 +277,7 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
             if not self.maps.has_key(fd):
                 raise ValueError, "'%s' is not a valid map" % fd
             # found a map
-            return fd[5:]
+            return fd
         raise ValueError, "To specify a map, you must prefix with map_"
 
     def __bobo_traverse__(self, req, param):
