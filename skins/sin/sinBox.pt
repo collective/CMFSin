@@ -17,12 +17,14 @@
 
 
 	<div class="portlet">
+	<div class="padding">
+	  
 	<h5 tal:content="map">mapname</h5>
 	  <div class="portletBody">
 	    <div tal:repeat="row rows">
-	       <div class="content"
-			tal:define="oddrow repeat/row/odd"
-			tal:attributes="class python:test(oddrow, 'content even', 'content odd')">
+	      <div class="portletContent"
+		tal:define="oddrow repeat/row/odd"
+		tal:attributes="class python:test(oddrow, 'portletContent even', 'portletContent odd')">
 			<a href="#"  tal:attributes="href row/link" tal:content="structure row/title"/>&nbsp;
 			<span tal:condition="python: row.get('date') or nothing" 
                 tal:content="python: here.toPortalTime(row['date'])" /><br/>
@@ -30,9 +32,10 @@
                 tal:replace="structure row/description" />
 	      </div>
 	    </div>
-<div class="boxDetails">
+<div class="portletDetails">
 [<a tal:attributes="href  python:'sinList?synmap=%s' % map" i18n:translate="see_more">see more</a>]
 </div>
+	  </div>
         </div>
       </div>
     </div>
