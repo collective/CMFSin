@@ -1,6 +1,4 @@
-Currently we use a very simple config file: This will have to change
-as we really want to be able to talk about thigns like manually
-controlled syn intervals and such.
+This is an example of the configuration you can use.  There is already a default configuration file that is loaded when CMFSin is first installed.
 
 ---------
 
