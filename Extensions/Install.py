@@ -40,7 +40,7 @@ def install(self):
     install_tools(self, out)
     install_actions(self, out)
     install_subskin(self, out)
-    
+    self.sin_tool.load('default.cfg')
     return out.getvalue()
 
 
