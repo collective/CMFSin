@@ -53,20 +53,10 @@ land.
       ex: here/sin_tool/map_geek
 
 
- <b>Older Documentation</b>
+Credits:
 
- See default.cfg for more information on configuring the mappings. The file www/debug.zpt shows how you might call the SinTool.sin(mapName) method to display syndication data. 
+ * Ben <bcsaller@yahoo.com>
 
- To install just add the SinTool to your CMF Site. If you want to get
-running quickly and to see if its working just goto the config tab and
-in the box at the bottom type "test", then hit import. After that try
-the "debug" tab.
+ * Thanks to Mark Pilgrim for the rssparser that I use (a hacked up version of) 
 
- CMFSin ships with a sample usage of the sinBox slot.
-
- To add an rss slot to your main template, go to your portal's properties  (not your portal_properties!) in the zmi, and add 'here/rss_slot/macros/humorBox' to either the left_slots or right_slots.
-
-   Good Luck,
-   -Ben <bcsaller@yahoo.com>
-
- PS: Thanks to Mark Pilgrim for the rssparser that I use (a hacked up version of) 
+ * Andy McKay, Richard Amerman and Jon Lim and Sprint Victoria for 0.6
