@@ -14,7 +14,7 @@
                   verbose verbose | false;
                   max max_size | default_max;
                   sin here/sin_tool;
-                  map options/map | request/map | here/sin_tool/get_current_feed;
+                  map options/map | request/map | here/sin_tool/getCurrentFeed;
                   rows python:sin.sin(map, max_size=max)">
 
 
@@ -31,7 +31,7 @@
 	      </div>
 	    </div>
 	  &nbsp;&nbsp;&nbsp;...<a  tal:attributes="href  python:'sinList?synmap=%s' % map" i18n:translate="complete_list">Complete List</a>
-        </div>         
+        </div>
       </div>
     </div>
 </body>

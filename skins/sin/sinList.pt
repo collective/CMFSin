@@ -11,7 +11,7 @@
     </tal:block>
   </metal:block>
 
-  <div metal:fill-slot="main" 
+  <div metal:fill-slot="main"
        tal:define="true python: 1;
                    false python: 0;
                    verbose python: 1;
@@ -25,14 +25,14 @@
         <div class="contentHeader">
         <h1 tal:content="m">Title or id</h1>
         </div>
-       
-	<tal:block tal:define="batch python:Batch(results, 15, int(b_start), orphan=1)"> 
+
+	<tal:block tal:define="batch python:Batch(results, 15, int(b_start), orphan=1)">
 
         <!-- Navigation -->
         <div metal:use-macro="here/batch_macros/macros/navigation" />
 
 	<dl tal:repeat="obj batch">
-		<dt><a href="#"  tal:attributes="href obj/link" tal:content="obj/title"/>&nbsp; <span tal:condition="python: obj.get('date') or nothing" tal:content="python: here.toPortalTime(obj['date']);"/></dt> 
+		<dt><a href="#"  tal:attributes="href obj/link" tal:content="obj/title"/>&nbsp; <span tal:condition="python: obj.get('date') or nothing" tal:content="python: here.toPortalTime(obj['date']);"/></dt>
 		<dd><span tal:condition="python: verbose and obj.get('description') or nothing" tal:replace="structure obj/description"/></dd>
 	</dl>
 

@@ -11,7 +11,7 @@ TIME_KEY =  {
     'm' : 'monthly',
     'y' : 'yearly',
     }
-    
+
 
 TIME_SCALE = {
     'hourly' : 60 * 60,
@@ -22,6 +22,7 @@ TIME_SCALE = {
     }
 
 class Channel(SimpleItem):
+
     def __init__(self, id, uri, **kwargs):
         self.id = id
         self.title = id
@@ -32,7 +33,7 @@ class Channel(SimpleItem):
         self.updateFrequency = int(kwargs.get('frequency', 1))
         self._v_failCount    = 0
         self._v_failTime     = None
-        
+
         self.last = None
 
     def update(self, data=None):
@@ -52,7 +53,6 @@ class Channel(SimpleItem):
             self.updatePeriod    = info.get('updatePeriod', self.updatePeriod)
             self.updateFrequency = int(info.get('updateFrequency', self.updateFrequency))
             self.title           = info.get('title', self.id)
-            
 
     def failed(self):
         """set a channel failure"""
@@ -64,7 +64,6 @@ class Channel(SimpleItem):
         """clear any errors"""
         self._v_failCount = 0
         self._v_failTime  = None
-        
 
     def nextUpdateSeconds(self):
         """The next update"""
@@ -75,7 +74,7 @@ class Channel(SimpleItem):
 
         #Find if we exceeded the delta
         seconds = self.updateFrequency * TIME_SCALE[self.updatePeriod]
-        
+
         return seconds + last
 
     def nextUpdate(self):
@@ -89,16 +88,16 @@ class Channel(SimpleItem):
         if not hasattr(self, '_v_failCount'):
             self._v_failCount = 0
             self._v_failTime  = None
-            
+
         if self._v_failCount > FAIL_THRESHOLD:
             if self._v_failTime < now:
                 self.clear()
-        
+
         if self.nextUpdateSeconds() < now:
             return 1
         return 0
-        
-        
-        
-    
-    
+
+
+
+
+

@@ -1,28 +1,26 @@
+import os, os.path
+import re
+
 from AccessControl import ClassSecurityInfo
 from BTrees.OOBTree import OOBTree
 from SinConfigParser import ConfigParser
 from Globals import InitializeClass, package_home
 from OFS.SimpleItem import SimpleItem
 from Products.CMFCore.Expression import Expression
-from Products.CMFCore  import CMFCorePermissions
+from Products.CMFCore.CMFCorePermissions  import ManagePortal, ModifyPortalContent, View
 from Products.CMFCore.ActionInformation import ActionInformation
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.utils import UniqueObject, getToolByName
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from StringIO import StringIO
-import os, os.path
-import re
+from ComputedAttribute import ComputedAttribute
 
 from Map import Map
 from Channel import Channel
 from rssparser import parse
 from OrderPolicy import listPolicies
 
-
 schedRe = re.compile("(?P<freq>\d+)(?P<period>h|d|w|m|y):")
-
-#ManageNewsFeeds = "Manage News Feeds"
-#CMFCorePermissions.setDefaultRoles(ManageNewsFeeds, ('Manager',))
 
 _parsers = {}
 
@@ -34,8 +32,11 @@ def lookupParser(channel, default=parse):
 
 class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
     """ CMF Syndication Client  """
+
     id        = 'sin_tool'
     meta_type = 'CMFSin Syndication Tool'
+
+    security = ClassSecurityInfo()
 
     _actions = [ActionInformation(
         id='newfeeds'
@@ -43,14 +44,12 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
         , action=Expression(
         text='string: ${portal_url}/sin_tool/sincfg')
         ,condition=Expression(
-        text='member') 
+        text='member')
 #        , permissions=(ManageNewsFeeds,)
-        , permissions=(CMFCorePermissions.ManagePortal,)
+        , permissions=(ManagePortal,)
         , category='portal_tabs'
         , visible=0
         )]
-    
-
 
     manage_options=(
         ({ 'label'   : 'Config',
@@ -68,17 +67,28 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
 
     def __init__(self):
         self._reset()
-        
+
     def _reset(self, config=None):
         self.maps     = OOBTree()
         self.data     = OOBTree()
         self.channels = OOBTree()
         self.config   = config
-        
-    def Maps(self): return self.maps.values()
-    def Channels(self): return self.channels.values()
-    def Policies(self): return listPolicies()
-    
+
+    security.declarePublic('Maps')
+    def Maps(self):
+        """ Available Maps """
+        return self.maps.values()
+
+    security.declarePublic('Channels')
+    def Channels(self):
+        """ Available Channels """
+        return self.channels.values()
+
+    security.declarePublic('Policies')
+    def Policies(self):
+        """ Available Policies """
+        return listPolicies()
+
     def _update(self, channel):
         # Hard update of a channels feed -> data
         try:
@@ -90,7 +100,8 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
             self.data[channel.id] = data
         except (IOError, OSError):
             channel.failed()
-    
+
+    security.declareProtected(View, 'updateChannel')
     def updateChannel(self, channel, force=0):
         if not isinstance(channel, Channel):
             channel = self.channels[channel]
@@ -98,16 +109,19 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
         if force == 1 or channel.requireUpdate():
             self._update(channel)
 
+    security.declareProtected(View, 'sin')
     def sin(self, map, force=0, max_size=None):
-        """Returns the syndication info for a given mapping
+        """
+        Returns the syndication info for a given mapping
         force    -- force a channel update
         max_size -- max size of result set (may be used in policy to calc pri)
         """
+
         # With a fallback to channel for development
         map = self.maps.get(map)
         if not map: map = self.channels[map]
-            
-        for ci  in map.Channels():
+
+        for ci in map.Channels():
             enabled = ci['enabled']
             if not enabled: continue
             channel = ci['channel']
@@ -117,7 +131,7 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
         results = []
         links   = {}
 
-        for ci  in map.Channels():
+        for ci in map.Channels():
             enabled = ci['enabled']
             if not enabled: continue
             channel = ci['channel']
@@ -135,27 +149,29 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
                 #doesn't keep any data, just the channel
                 #relationship, if this is an issue
                 #its easy enough to change
-                
+
             data[0]['priority'] = priority
             results.append(data)
-            
+
         policy = map.policy
         results = policy.order(results, max_size=max_size)
 
         return results
 
-
+    security.declareProtected(ModifyPortalContent, 'addChannel')
     def addChannel(self, name, url, **kwargs):
         c = Channel(name, url, **kwargs)
         self.channels[name] = c
-        
+
+    security.declareProtected(ModifyPortalContent, 'addMap')
     def addMap(self, map, channels=[]):
         self.maps[map] = m = Map(map)
         for c in channels:
             c = self.channels[c]
             m.addChannel(c)
         return m
-    
+
+    security.declarePrivate('parse')
     def parse(self, file):
         if type(file) == type(''):
             file = StringIO(file)
@@ -163,8 +179,6 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
         config = ConfigParser()
         config.readfp(file)
 
-        #self._reset()
-        
         s = 'channels'
         options = config.options(s)
         args = {}
@@ -177,7 +191,7 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
                 args['frequency'] = int(match.group('freq'))
             self.addChannel(o, uri, **args)
             args.clear()
-            
+
         s = 'maps'
         options = config.options(s)
         for o in options:
@@ -204,44 +218,44 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
                         c = c[:idx]
                 else:
                     pri = 0
-                    
+
                 c = self.channels[c]
                 m.addChannel(c, priority=pri)
-                
+
 
         file.seek(0)
         self.config = file.read()
-        
+
+    security.declarePrivate('load')
     def load(self, filename):
-        #load a file into config
+        """ Load a file into config """
         name = os.path.join(package_home(globals()), os.path.basename(filename))
         if not name.endswith('.cfg'):
             name += '.cfg'
 
         fp = open(name)
-        #self._reset()
         self.parse(fp)
 
-        
-
+    security.declarePrivate('save')
     def save(self, filename):
-        #load a file into config
+        """ Write config into a file """
         name = os.path.join(package_home(globals()), os.path.basename(filename))
         if not name.endswith('.cfg'):
             name += '.cfg'
-            
+
         fp = open(name, 'w')
         fp.write(self.config)
         fp.close()
-        
-        
+
+    security.declareProtected(ModifyPortalContent, 'updateConfig')
     def updateConfig(self, config=None, REQUEST=None, *args):
         """Update the config using new info"""
         self.parse(config)
 
         if REQUEST:
             return REQUEST.RESPONSE.redirect(self.absolute_url() + "/sincfg?portal_status_message=Config+Updated")
-        
+
+    security.declareProtected(ManagePortal, 'manage_configSin')
     def manage_configSin(self, submit, config='', filename='', REQUEST=None, **kwargs):
         """config this puppy"""
         if submit == "Set Config":
@@ -254,12 +268,13 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
         if REQUEST:
             return REQUEST.RESPONSE.redirect(self.absolute_url() + "/manage_workspace")
 
+    security.declareProtected(ManagePortal, 'manage_debug')
     def manage_debug(self, submit, maps=(),  REQUEST=None, *args, **kwargs):
         """update maps for testing"""
         if submit == "Purge":
             self._reset(self.config)
             self.parse(self.config)
-            
+
         elif submit == "Update Maps":
             for id in maps:
                 self.sin(id, force=1)
@@ -267,39 +282,56 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
         if REQUEST:
             return REQUEST.RESPONSE.redirect(self.absolute_url() + "/manage_workspace")
 
-    # big hack-o-rama so that we can specify a slot using a 
-    # path expression eg: here/sintool/map_slashdot
-    def get_current_feed(self):
-        """ Get the feed """
+    security.declarePrivate('setCurrentFeed')
+    def setCurrentFeed(self, name):
+        self._v_current_feed = name
+
+    security.declareProtected(View, 'getCurrentFeed')
+    def getCurrentFeed(self):
+        """ Get the current configured feed """
         fd = self._v_current_feed
-        if fd.startswith('map_'):
-            fd = fd[4:]
-            if not self.maps.has_key(fd):
-                raise ValueError, "'%s' is not a valid map" % fd
-            # found a map
-            return fd
-        raise ValueError, "To specify a map, you must prefix with map_"
+        if fd not in self.maps.keys():
+            raise ValueError, "'%s' is not a valid map" % fd
+        return fd
 
-    def __bobo_traverse__(self, req, param):
-        """ Hack so that we can call particular
-        feeds from a ZPT path expression """
-        if param.startswith('map_'):
-            # go get the zpt
-            # eek this is hardcoding in a few things...
-            pt = getattr(self.aq_parent.portal_skins, 'sinBox')
-            # this is a little bad, but here we dont have
-            # request etc...
-            self._v_current_feed = param
-            return pt
-        else:
-            # continue as normal
-            return getattr(self, param)
-            
-        
+    # slightly improved hack-o-rama to allow
+    # using a simpler path expression: here/sintool/macros/slashdot
+    security.declareProtected(View, 'map')
+    def macros(self):
+        """ Allow traversing to map macro via ZPT """
+        return SinMacro(self)
 
+    macros = ComputedAttribute(macros, 1)
 
 InitializeClass(SinTool)
 
+class SinMacro:
+    """ A dict-like object to allow configurable traversing to the macro
+    while setting up the current feed reliably """
 
+    def __init__(self, sintool, template='sinBox', macro='sinBox'):
+        self._sintool = sintool
+        self._template = template
+        self._macro = macro
+
+    def __repr__(self):
+        return '<SinMacro at %s template: %s, macro: %s, maps: %s>' % \
+               (id(self), self._template, self._macro, ','.join(self._sintool.maps.keys()))
+
+    def __getattr__(self, key):
+        if key in self.__dict__.keys():
+            return getattr(self, key)
+        return getattr(self._sintool, key)
+
+    def __getitem__(self, key):
+        if key not in self._sintool.maps.keys():
+            raise KeyError(key)
+        skinstool = getToolByName(self._sintool, 'portal_skins')
+        template = getattr(skinstool, self._template)
+        macro = template.macros[self._macro]
+        # this is a little bad, but here we dont have
+        # request etc...
+        self._sintool.setCurrentFeed(key)
+        return macro
 
 

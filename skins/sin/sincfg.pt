@@ -3,16 +3,16 @@
       lang="en-US"
       metal:use-macro="here/main_template/macros/master"
       i18n:domain="plone">
-      
+
 <body>
 
-   <div metal:fill-slot="main" 
+   <div metal:fill-slot="main"
       tal:define="rejection here/rejectAnonymous;
-      sin here/sin_tool;	
+      sin here/sin_tool;
       cfg request/config | sin/config | nothing;
       Iterator python:modules['Products.CMFPlone'].IndexIterator;
       tabindex python:Iterator();">
-      
+
 	  <form action="updateConfig" method="POST">
 
 
@@ -29,7 +29,7 @@
      value="Set Config"/>
 	</div>
 
-	
+
 	</form>
     <pre>
 Currently we use a very simple config file: This will have to change
@@ -53,8 +53,8 @@ geek=random:slashdot,freshmeat
 
 ---------
 
-channels are the real news feeds, these map to Channel objects. 
-channels are 
+channels are the real news feeds, these map to Channel objects.
+channels are
 NAME=[time]URI
 
 where the optional time spec is

@@ -16,7 +16,7 @@ land.
 
     In the ZMI, add a CMFQuickInstaller Tool to your CMF/Plone Site.
     Click on portal_quickinstaller.  Check CMFSin and click "Install".
-	 
+
     Using External Method:
 
     Add an External Method to your CMF/Plone site and specify the
@@ -40,23 +40,24 @@ land.
  3. Add syndication mappings to the "map" section.
 
       syntax: <i>mapname</i>=<i>channelname</i> [,<i>channelname</i>]*
- 
+
       ex: geek=freshmeat,slashdot
 
  4. Click "Set Config".
-    
- 5. Finally, go to the Properties tab of your CMF/Plone site then 
-    add the mappings you defined to your left_slots or right_slots. 
 
-      syntax: here/sin_tool/map_<i>mapname</i>
+ 5. Finally, go to the Properties tab of your CMF/Plone site then
+    add the mappings you defined to your left_slots or right_slots.
 
-      ex: here/sin_tool/map_geek
+      syntax: here/sin_tool/macros/<i>mapname</i>
 
+      ex: here/sin_tool/macros/geeknews
 
 Credits:
 
  * Ben <bcsaller@yahoo.com>
 
- * Thanks to Mark Pilgrim for the rssparser that I use (a hacked up version of) 
+ * Thanks to Mark Pilgrim for the rssparser that I use (a hacked up version of)
 
  * Andy McKay, Richard Amerman and Jon Lim and Sprint Victoria for 0.6
+
+ * Sidnei da Silva (dreamcatcher) for house cleaning and beer drinking.
