@@ -47,7 +47,7 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
 #        , permissions=(ManageNewsFeeds,)
         , permissions=(CMFCorePermissions.ManagePortal,)
         , category='portal_tabs'
-        , visible=1
+        , visible=0
         )]
     
 
@@ -266,6 +266,36 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
 
         if REQUEST:
             return REQUEST.RESPONSE.redirect(self.absolute_url() + "/manage_workspace")
+
+    # big hack-o-rama so that we can specify a slot using a 
+    # path expression eg: here/sintool/map_slashdot
+    def get_current_feed(self):
+        """ Get the feed """
+        fd = self._v_current_feed
+        if fd.startswith('map_'):
+            fd = fd[5:]
+            if not self.map.has_key(fd):
+                raise ValueError, "'%s' is not a valid map" % fd
+            # found a map
+            return fd[5:]
+        raise ValueError, "To specify a map, you must prefix with map_"
+
+    def __bobo_traverse__(self, req, param):
+        """ Hack so that we can call particular
+        feeds from a ZPT path expression """
+        if param.startswith('map_'):
+            # go get the zpt
+            # eek this is hardcoding in a few things...
+            pt = getattr(self.aq_parent.portal_skins, 'sinBox')
+            # this is a little bad, but here we dont have
+            # request etc...
+            self._v_current_feed = param
+            return pt
+        else:
+            # continue as normal
+            return getattr(self, param)
+            
+        
 
 
 InitializeClass(SinTool)
