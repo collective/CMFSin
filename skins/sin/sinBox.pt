@@ -1,5 +1,3 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 <html xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       i18n:domain="plone">
@@ -19,18 +17,20 @@
 
 
 	<div class="box">
-	<h5 tal:content="map"/>
+	<h5 tal:content="map">mapname</h5>
 	  <div class="body">
 	    <div tal:repeat="row rows">
 	       <div class="content"
 			tal:define="oddrow repeat/row/odd"
 			tal:attributes="class python:test(oddrow, 'content even', 'content odd')">
 			<a href="#"  tal:attributes="href row/link" tal:content="row/title"/>&nbsp;
-			<span tal:condition="python: row.get('date') or nothing" tal:content="python: here.toPortalTime(row['date']);"/><br/>
-			<span tal:condition="python: verbose and row.get('description') or nothing" tal:replace="structure row/description"/>
+			<span tal:condition="python: row.get('date') or nothing" tal:content="python: here.toPortalTime(row['date'])" /><br/>
+			<span tal:condition="python: verbose and row.get('description') or nothing" tal:replace="structure row/description" />
 	      </div>
 	    </div>
-	  &nbsp;&nbsp;&nbsp;...<a  tal:attributes="href  python:'sinList?synmap=%s' % map" i18n:translate="complete_list">Complete List</a>
+<div class="boxDetails">
+[<a tal:attributes="href  python:'sinList?synmap=%s' % map" i18n:translate="see_more">see more</a>]
+</div>
         </div>
       </div>
     </div>
