@@ -1,0 +1,21 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      i18n:domain="plone">
+
+  <body>
+    
+    <!-- Example of how to define fun macros for rss news boxes usings -->
+    <!-- sinBox -->
+    <div metal:define-macro="geek_box" 
+      tal:define="m string:geek; 
+      verbose python: 0;
+      max_size python: 5">
+      <div metal:use-macro="here/sinBox/macros/sinBox"/>
+      </div>
+      
+
+  </body>
+  
+</html>
