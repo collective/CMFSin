@@ -16,9 +16,9 @@
                   rows python:sin.sin(map, max_size=max)">
 
 
-	<div class="box">
+	<div class="portlet">
 	<h5 tal:content="map">mapname</h5>
-	  <div class="body">
+	  <div class="portletBody">
 	    <div tal:repeat="row rows">
 	       <div class="content"
 			tal:define="oddrow repeat/row/odd"
