@@ -33,13 +33,13 @@ land.
  2. In the ZMI, go to the new sin_tool object of your CMF/Plone site.
     Add RSS or RDF channels to the "channels" section:
 
-      syntax: <i>channelname</i>=<i>url</i>
+      syntax: <channelname>=<url>
 
       ex: freshmeat=http://freshmeat.net/backend/fm-releases-software.rdf
 
  3. Add syndication mappings to the "map" section.
 
-      syntax: <i>mapname</i>=<i>channelname</i> [,<i>channelname</i>]*
+      syntax: <mapname>=<channelname> [,<channelname>]*
 
       ex: geek=freshmeat,slashdot
 
@@ -48,7 +48,7 @@ land.
  5. Finally, go to the Properties tab of your CMF/Plone site then
     add the mappings you defined to your left_slots or right_slots.
 
-      syntax: here/sin_tool/macros/<i>mapname</i>
+      syntax: here/sin_tool/macros/<mapname>
 
       ex: here/sin_tool/macros/geeknews
 
