@@ -5,39 +5,40 @@
 <body>
 
 <!-- The a sin box row -->
-    <div metal:define-macro="sinBox" tal:on-error="string:"
-      		tal:define="default_max python: 10;
+  <div metal:define-macro="sinBox" tal:on-error="string:"
+       tal:define="default_max python: 10;
                   true python: 1;
                   false python: 0;
                   verbose verbose | false;
                   max max_size | default_max;
                   sin here/sin_tool;
-                  map options/map | request/map | here/sin_tool/getCurrentFeed;
+                  map map | options/map | request/map | here/sin_tool/getCurrentFeed;
                   rows python:sin.sin(map, max_size=max)">
 
 
-	<div class="portlet">
-	<div class="padding">
+	<dl class="portlet">
 	  
-	<h5 tal:content="map">mapname</h5>
-	  <div class="portletBody">
-	    <div tal:repeat="row rows">
-	      <div class="portletContent"
-		tal:define="oddrow repeat/row/odd"
-		tal:attributes="class python:test(oddrow, 'portletContent even', 'portletContent odd')">
-			<a href="#"  tal:attributes="href row/link" tal:content="structure row/title"/>&nbsp;
-			<span tal:condition="python: row.get('date') or nothing" 
-                tal:content="python: here.toLocalizedTime(row['date'])" /><br/>
-			<span tal:condition="python: verbose and row.get('description') or nothing" 
-                tal:replace="structure row/description" />
-	      </div>
-	    </div>
-<div class="portletDetails">
-[<a tal:attributes="href  python:'sinList?synmap=%s' % map" i18n:translate="see_more">see more</a>]
-</div>
-	  </div>
-        </div>
-      </div>
-    </div>
+	<dt class="portletHeader" tal:content="map">mapname</dt>
+    <tal:repeat tal:repeat="row rows">
+      <dd class="portletItem"
+           tal:define="oddrow repeat/row/odd"
+           tal:attributes="class python:test(oddrow, 'portletItem even', 'portletItem odd')">
+           <a href="#"  tal:attributes="href row/link">
+               <tal:title tal:content="structure row/title"/> <br />
+               <span class="portletItemDetails"
+                     tal:condition="python: row.get('date') or nothing" 
+                     tal:content="python: here.toLocalizedTime(row['date'])" />
+               <span class="portletItemDetails"
+                     tal:condition="python: verbose and row.get('description') or nothing" 
+                     tal:replace="structure row/description" />
+          </a>
+      </dd>
+    </tal:repeat>
+    <dd class="portletFooter">
+        <a tal:attributes="href  python:'sinList?synmap=%s' % map">
+            <span i18n:translate="see_more">see more</span>&hellip;
+        </a>
+    </dd>
+  </div>
 </body>
 </html>
