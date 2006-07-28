@@ -1,47 +1,56 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US"
-      lang="en-US"
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      lang="en"
       metal:use-macro="here/main_template/macros/master"
       i18n:domain="plone">
 
-  <metal:block fill-slot="base">
-    <tal:block tal:define="dummy python:request.set('disable_border', 1)"
-               tal:replace="nothing">
-    Disable the tabs
+<metal:block fill-slot="top_slot"
+             tal:define="dummy python:request.set('disable_border',1)" />
+
+<body>
+
+<div metal:fill-slot="main"
+     tal:define="verbose python:request.get('verbose', 1);
+                 sin here/sin_tool;
+                 map request/synmap;
+                 results python:sin.sin(map);
+                 Batch python:modules['Products.CMFPlone'].Batch;
+                 b_size python:15;
+                 b_start python:0;
+                 b_start request/b_start | b_start;
+                 batch python:Batch(results, b_size, int(b_start), orphan=1);">
+
+    <h1 tal:content="map">title</h1>
+
+    <div metal:use-macro="here/batch_macros/macros/navigation" />
+
+    <dl>
+    <tal:block repeat="obj batch">
+		<dt>
+            <span class="contenttype-link">
+                <a href="#"
+                   tal:attributes="href obj/link"
+                   tal:content="structure obj/title">title</a>
+            </span>
+            <span class="discreet"
+                  tal:condition="python:obj.get('date') or nothing"
+                  i18n:translate="results_by_author">
+                by <span tal:replace="python:obj.get('author', '')" i18n:name="author">author</span>,
+                <span tal:replace="python:toLocalizedTime(obj['date'], long_format=1)" i18n:name="date">date</span>
+            </span>
+        </dt>
+		<dd tal:condition="python:verbose and obj.get('description') or nothing"
+            tal:content="structure obj/description">description</dd>
     </tal:block>
-  </metal:block>
-
-  <div metal:fill-slot="main"
-       tal:define="true python: 1;
-                   false python: 0;
-                   verbose python: 1;
-		   sin here/sin_tool;
-                   m request/synmap;
-		   results python:sin.sin(m);
-                   Batch python:modules['Products.CMFPlone'].Batch;
-                   b_start python:request.get('b_start',0);
-		   ">
-
-        <div class="contentHeader">
-        <h1 tal:content="m">Title or id</h1>
-        </div>
-
-	<tal:block tal:define="batch python:Batch(results, 15, int(b_start), orphan=1)">
-
-        <!-- Navigation -->
-        <div metal:use-macro="here/batch_macros/macros/navigation" />
-
-	<dl tal:repeat="obj batch">
-		<dt><a href="#"  tal:attributes="href obj/link" tal:content="structure obj/title"/>&nbsp; <span tal:condition="python: obj.get('date') or nothing" tal:content="python: here.toLocalizedTime(obj['date'])"/></dt>
-		<dd><span tal:condition="python: verbose and obj.get('description') or nothing" tal:replace="structure obj/description"/></dd>
 	</dl>
 
-        <!-- Navigation -->
-        <div metal:use-macro="here/batch_macros/macros/navigation" />
-	</tal:block>
-        <p tal:condition="not: results" i18n:translate="description_no_items_in_feed">
-           There are currently no items in this feed.
-        </p>
-    </div>
-</html>
+    <div metal:use-macro="here/batch_macros/macros/navigation" />
 
+    <p tal:condition="not:results"
+       i18n:translate="description_no_items_in_feed">
+       There are currently no items in this feed.
+    </p>
+
+</div>
+
+</body>
+</html>
