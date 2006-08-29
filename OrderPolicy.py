@@ -25,7 +25,6 @@ class OrderPolicy:
 class SimplePolicy(OrderPolicy):
     name = "simple"
     def order(self, results, max_size=None):
-        LOG('Simple Policy ', INFO, 'a debugging message')
         """Just return the results cap'ed at size"""
         final = []
         for ch in results:

@@ -17,6 +17,7 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from StringIO import StringIO
 from Acquisition import aq_base
 from ComputedAttribute import ComputedAttribute
+from zLOG import LOG, DEBUG, INFO
 
 from Map import Map
 from Channel import Channel
@@ -178,8 +179,12 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
         # With a fallback to channel for development
         map = self.maps.get(map_name)
         if not map:
-            map = self.channels[map_name]
-            channels = (map, )
+            map = self.channels.get(map_name, None)
+            if map is None:
+                LOG('SinTool.sin', INFO, 'channel %s not found' % map_name)
+                return []
+            else:
+                channels = (map, )
         else:
             channels = map.Channels()
 

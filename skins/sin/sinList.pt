@@ -35,7 +35,7 @@
                   tal:condition="python:obj.get('date') or nothing"
                   i18n:translate="results_by_author">
                 by <span tal:replace="python:obj.get('author', '')" i18n:name="author">author</span>,
-                <span tal:replace="python:toLocalizedTime(obj['date'], long_format=1)" i18n:name="date">date</span>
+                <span tal:replace="python:here.toLocalizedTime(obj['date'], long_format=1)" i18n:name="date">date</span>
             </span>
         </dt>
 		<dd tal:condition="python:verbose and obj.get('description') or nothing"
