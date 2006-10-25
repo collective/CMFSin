@@ -24,6 +24,8 @@ from Channel import Channel
 from rssparser import parse
 from OrderPolicy import listPolicies
 
+from AccessControl import allow_class
+
 schedRe = re.compile("(?P<freq>\d+)(?P<period>h|d|w|m|y):")
 
 _parsers = {}
@@ -399,10 +401,13 @@ class SinMacro:
                (id(self), self._template, self._macro, \
                 ','.join(self._sintool.maps.keys()))
 
-    def __getattr__(self, key):
-        if key in self.__dict__.keys():
-            return getattr(self, key)
-        return getattr(self._sintool, key)
+#
+#     --> useless method ???
+#
+#     def __getattr__(self, key):
+#         if key in self.__dict__.keys():
+#             return getattr(self, key)
+#         return getattr(self._sintool, key)
 
     def __getitem__(self, key):
         if key not in self._sintool.maps.keys():
@@ -416,3 +421,4 @@ class SinMacro:
         return macro
 
 
+allow_class(SinMacro)
