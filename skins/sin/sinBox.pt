@@ -36,7 +36,7 @@
     </tal:repeat>
     <dd class="portletFooter">
         <a tal:attributes="href  python:'sinList?synmap=%s' % map">
-            <span i18n:translate="see_more">see more</span>&hellip;
+            <span i18n:translate="read_more">Read more</span>&hellip;
         </a>
     </dd>
   </div>
