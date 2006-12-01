@@ -133,16 +133,14 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
             pass
         info = parsed_data['channel']
         data = parsed_data['items']
-        if info.has_key('title'):
-            if type(info['title']) not in (UnicodeType, ):
-                info['title'] = udecode(info['title']).encode(enc)
-        if info.has_key('description'):
-            if type(info['description']) not in (UnicodeType, ):
-                info['description'] = udecode(info['description']).encode(enc)
+        encoding = parsed_data.get('encoding', 'ascii')
+        for key in ('description', 'tagline', 'title'):
+            if isinstance(info[key], basestring) and not isinstance(info[key], unicode):
+                info[key] = udecode(info[key], encoding)
         for r in data:
-            if r.has_key('title'):
-                if type(r['title']) not in (UnicodeType, ):
-                    r['title'] = udecode(r['title']).encode(enc)
+            for key in ('description', 'source', 'summary', 'title'):
+                if isinstance(r[key], basestring) and not isinstance(r[key], unicode):
+                    r[key] = udecode(r[key], encoding)
         return info, data
 
     def _update(self, channel, force=None):
