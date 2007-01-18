@@ -9,7 +9,11 @@ from SinConfigParser import ConfigParser
 from Globals import InitializeClass, package_home
 from OFS.SimpleItem import SimpleItem
 from Products.CMFCore.Expression import Expression
-from Products.CMFCore.CMFCorePermissions  import ManagePortal, ModifyPortalContent, View
+try:
+    from Products.CMFCore.permissions import ManagePortal, ModifyPortalContent, View
+except ImportError:
+    from Products.CMFCore.CMFCorePermissions  import ManagePortal, ModifyPortalContent, View
+    
 from Products.CMFCore.ActionInformation import ActionInformation
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.utils import UniqueObject, getToolByName
@@ -133,14 +137,27 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
             pass
         info = parsed_data['channel']
         data = parsed_data['items']
-        encoding = parsed_data.get('encoding', 'ascii')
-        for key in ('description', 'tagline', 'title'):
-            if isinstance(info[key], basestring) and not isinstance(info[key], unicode):
-                info[key] = udecode(info[key], encoding)
+
+#         encoding = parsed_data.get('encoding', 'ascii')
+#         for key in ('description', 'tagline', 'title'):
+#             if isinstance(info[key], basestring) and not isinstance(info[key], unicode):
+#                 info[key] = udecode(info[key], encoding)
+#         for r in data:
+#             for key in ('description', 'source', 'summary', 'title'):
+#                 if isinstance(r[key], basestring) and not isinstance(r[key], unicode):
+#                     r[key] = udecode(r[key], encoding)
+#         return info, data
+        
+        if info.has_key('title'):
+            if type(info['title']) not in (UnicodeType, ):
+                info['title'] = udecode(info['title']).encode(enc)
+        if info.has_key('description'):
+            if type(info['description']) not in (UnicodeType, ):
+                info['description'] = udecode(info['description']).encode(enc)
         for r in data:
-            for key in ('description', 'source', 'summary', 'title'):
-                if isinstance(r[key], basestring) and not isinstance(r[key], unicode):
-                    r[key] = udecode(r[key], encoding)
+            if r.has_key('title'):
+                if type(r['title']) not in (UnicodeType, ):
+                    r['title'] = udecode(r['title']).encode(enc)
         return info, data
 
     def _update(self, channel, force=None):
@@ -376,7 +393,7 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
 
     # slightly improved hack-o-rama to allow
     # using a simpler path expression: here/sintool/macros/slashdot
-    security.declareProtected(View, 'map')
+    security.declareProtected(View, 'macros')
     def macros(self):
         """ Allow traversing to map macro via ZPT """
         return SinMacro(self)
