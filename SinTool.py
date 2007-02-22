@@ -391,6 +391,12 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
             raise ValueError, "'%s' is not a valid map" % fd
         return fd
 
+    security.declareProtected(View, 'getChannelUri')
+    def getChannelUri(self, map_name):
+        """ return the uri of a given channel """
+        map = self.sin_tool.maps.get(map_name)
+        return map.Channels()[0]['channel'].uri    
+        
     # slightly improved hack-o-rama to allow
     # using a simpler path expression: here/sintool/macros/slashdot
     security.declareProtected(View, 'macros')
