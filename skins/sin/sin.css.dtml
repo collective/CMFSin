@@ -1,0 +1,24 @@
+/* 
+** TeleServices style sheet for CSS2-capable browsers.
+**
+*/
+
+/* <dtml-with base_properties> */
+/* <dtml-call "REQUEST.set('portal_url', portal_url())"> */
+
+/* Add a RSS next to the map name */
+
+.sinRSSIcon {
+    padding-right: 2em;
+    text-align: right;
+    valign: center;
+    width: 100%;
+}
+
+.sinTableTitle {
+    color: #E8BF73;
+    font-weight: bold;
+}
+
+/* </dtml-with> */
+ 
