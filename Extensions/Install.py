@@ -5,6 +5,9 @@ from Products.CMFCore.DirectoryView import addDirectoryViews
 
 SKIN_NAME = "sin"
 _globals = globals()
+STYLESHEETS = (
+    {'id': 'sin.css', 'media': 'screen', 'rendering': 'import'},
+        )
 
 def install_tools(self, out):
     if not hasattr(self, "sin_tool"):
@@ -33,6 +36,22 @@ def install_subskin(self, out, skin_name=SKIN_NAME, globals=sin_globals):
         path = ','.join(path)
         skinstool.addSkinSelection( skinName, path)
 
+        
+def registerStylesheets(self, out, stylesheets):
+    # register additional CSS stylesheets with portal_css
+    csstool = getToolByName(self, 'portal_css')
+    existing = csstool.getResourceIds()
+    updates = []
+    for css in stylesheets:
+        if not css.get('id') in existing:
+            csstool.registerStylesheet(**css)
+        else:
+            updates.append(css)
+    if updates:
+        updateResources(csstool, updates)
+    print >> out, "installed the Plone additional stylesheets."
+
+        
 def install(self):
     out = StringIO()
     print >>out, "Installing CMFSin"
@@ -40,6 +59,7 @@ def install(self):
     install_tools(self, out)
     install_actions(self, out)
     install_subskin(self, out)
+    registerStylesheets(self, out, STYLESHEETS)
     self.sin_tool.load('default.cfg')
     return out.getvalue()
 

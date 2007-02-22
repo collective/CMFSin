@@ -9,15 +9,15 @@
 /* Add a RSS next to the map name */
 
 .sinRSSIcon {
-    padding-right: 2em;
+    padding-right: 0.5em;
     text-align: right;
     valign: center;
     width: 100%;
 }
 
 .sinTableTitle {
-    color: #E8BF73;
-    font-weight: bold;
+    color: &dtml-fontColor;;
+    font-weight: normal;
 }
 
 /* </dtml-with> */
