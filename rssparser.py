@@ -132,6 +132,8 @@ __history__ = """
 
 _debug = 0
 
+DEFAULT_TIMEOUT = 10
+
 # if you are embedding feedparser in a larger application, you should change this to your application name and URL
 USER_AGENT = "UltraLiberalFeedParser/%s%s +http://diveintomark.org/projects/feed_parser/" % (__version__, _debug and "-debug" or "")
 
@@ -150,19 +152,6 @@ try:
     import gzip
 except:
     gzip = None
-    
-# timeoutsocket allows feedparser to time out rather than hang forever on ultra-slow servers.
-# Python 2.3 now has this functionality available in the standard socket library, so under
-# 2.3 you don't need to install anything.
-import socket
-if hasattr(socket, 'setdefaulttimeout'):
-    socket.setdefaulttimeout(10)
-else:
-    try:
-        import timeoutsocket # http://www.timo-tasi.org/python/timeoutsocket.py
-        timeoutsocket.setDefaultSocketTimeout(10)
-    except ImportError:
-        pass
 
 # mxtidy allows feedparser to tidy malformed embedded HTML markup in description, content, etc.
 # this does not affect HTML sanitizing, which is self-contained in the HTMLSanitizer class
@@ -1019,14 +1008,45 @@ def open_resource(source, etag=None, modified=None, agent=None, referrer=None):
             request.add_header("Accept-encoding", "gzip")
     opener = urllib2.build_opener(FeedURLHandler())
     opener.addheaders = [] # RMK - must clear so we only send our custom User-Agent
-    try:
+
+    ## ----------------------------------------
+
+    # timeoutsocket allows feedparser to time out rather than hang forever on ultra-slow servers.
+    # Python 2.3 now has this functionality available in the standard socket library, so under
+    # 2.3 you don't need to install anything.
+
+    import socket
+    if hasattr(socket, 'setdefaulttimeout'):
+        socket.setdefaulttimeout(DEFAULT_TIMEOUT)
+
+    # http://www.timo-tasi.org/python/timeoutsocket.py
+    has_oldtimeoutsocket = 0
+    if not hasattr(socket, 'setdefaulttimeout'):
         try:
-            return opener.open(request)
-        except:
-            # source is not a valid URL, but it might be a valid filename
-            pass
-    finally:
-        opener.close() # JohnD
+            import timeoutsocket
+            has_oldtimeoutsocket = 1
+        except ImportError:
+             pass
+
+    if has_oldtimeoutsocket:
+        timeoutsocket.setDefaultSocketTimeout(DEFAULT_TIMEOUT)
+
+    ret = None
+    try:
+        ret = opener.open(request)
+    except:
+        # source is not a valid URL, but it might be a valid filename
+        pass
+
+    if has_oldtimeoutsocket:
+        timeoutsocket.setDefaultSocketTimeout(None)
+    else:
+        socket.setdefaulttimeout(None)
+
+    if ret is not None:
+        return ret
+
+    ## ----------------------------------------
     
     # try to open with native open function (if source is a filename)
     try:
