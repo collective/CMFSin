@@ -1,1 +1,1 @@
-0.6.2 svn/unreleased
+0.7

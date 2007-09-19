@@ -7,28 +7,15 @@ feeds to sets of composite virtual channels which can then be called
 in in a timely fashion. Most of the remaining work has to happen in UI
 land.
 
+CMFSin now should work in Plone 2.0, 2.1, and 2.5.  Please report any 
+bugs to the issue tracker: http://plone.org/products/cmfsin/issues
+
  <b>Step-by-step instructions</b>
 
- 1. Install either using the CMFQuickInstaller or using an external
-    method.
-
-    Using CMFQuickInstaller:
+ 1. Install using the CMFQuickInstaller or the Plone Control Panel.
 
     In the ZMI, add a CMFQuickInstaller Tool to your CMF/Plone Site.
     Click on portal_quickinstaller.  Check CMFSin and click "Install".
-
-    Using External Method:
-
-    Add an External Method to your CMF/Plone site and specify the
-    following:
-
-      ID: install_cmfsin
-
-      Module Name: CMFSin.Install
-
-      Function Name: install
-
-    Click "Test" to install CMFSin.
 
  2. In the ZMI, go to the new sin_tool object of your CMF/Plone site.
     Add RSS or RDF channels to the "channels" section:
@@ -61,3 +48,7 @@ Credits:
  * Andy McKay, Richard Amerman and Jon Lim and Sprint Victoria for 0.6
 
  * Sidnei da Silva (dreamcatcher) for house cleaning and beer drinking.
+ 
+ * Portland Plone User Group for cutting a new release after more than 2 years of
+ dormancy!
+ 
