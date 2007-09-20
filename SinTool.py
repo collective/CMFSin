@@ -26,7 +26,7 @@ from zLOG import LOG, DEBUG, INFO
 from Map import Map
 from Channel import Channel
 from rssparser import parse
-from OrderPolicy import listPolicies
+from OrderPolicy import listPolicies, SimplePolicy
 
 from AccessControl import allow_class
 
@@ -189,21 +189,29 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
         force    -- force a channel update
         max_size -- max size of result set (may be used in policy to calc pri)
         """
+        if map_name=='': return []
 
         if not hasattr(aq_base(self), '_v_data'):
             self._v_data = OOBTree()
 
-        # With a fallback to channel for development
-        map = self.maps.get(map_name)
-        if not map:
-            map = self.channels.get(map_name, None)
-            if map is None:
+        # Make sure map_name is a valid map name
+        if map_name in self.maps.keys():
+            map = self.maps.get(map_name)
+            channels = map.Channels()
+        else:
+            # Otherwise see if it is a channel name. Construct appropriate objects.
+            if map_name in self.channels.keys():
+                map = self.channels[map_name]
+                map.policy = SimplePolicy()
+                channel = {}
+                channel['priority'] = 0
+                channel['enabled'] = 1
+                channel['channel'] = map
+                channels = (channel, )
+            # Well, nothing we can use: return
+            else:
                 LOG('SinTool.sin', INFO, 'channel %s not found' % map_name)
                 return []
-            else:
-                channels = (map, )
-        else:
-            channels = map.Channels()
 
         for ci in channels:
             enabled = ci['enabled']
