@@ -1,0 +1,14 @@
+[default]
+title=Edit CMFSin config
+
+[security]
+View=0:Authenticated
+
+[validators]
+validators = 
+
+[actions]
+action.success..Save=traverse_to:string:cmfsincfg_edit
+action.success..Cancel=redirect_to:string:manage_cmfsin_form
+action.failure=traverse_to:string:manage_cmfsin_form
+action.success=traverse_to:string:cmfsincfg_edit

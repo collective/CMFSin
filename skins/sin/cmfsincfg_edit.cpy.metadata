@@ -1,0 +1,6 @@
+[validators]
+validators = validate_frequency
+
+[actions]
+action.success=redirect_to:string:manage_cmfsin_form
+action.failure=traverse_to:string:manage_cmfsin_form

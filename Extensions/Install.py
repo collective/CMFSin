@@ -51,6 +51,24 @@ def registerStylesheets(self, out, stylesheets):
         updateResources(csstool, updates)
     print >> out, "installed the Plone additional stylesheets."
 
+
+def install_configlet(self, out):
+    # register tool as configlet
+    portal_controlpanel = getToolByName(self,'portal_controlpanel')
+    portal_controlpanel.registerConfiglet(
+        'sin_tool', #id of your Tool
+        'CMFSin', # Title of your Product
+        'string:${portal_url}/sin_tool/manage_cmfsin_form/',
+        'python:True', # a condition
+        'Manage Portal', # access permission
+        'Products', # section to which the configlet should be added: (Plone, Products (default) or Member)
+        1, # visibility
+        'SinToolID',
+        'site_icon.gif', # icon in control_panel
+        'A tool for managing syndication sources',
+        None,
+    )
+    print >> out, "Registered the configlet."
         
 def install(self):
     out = StringIO()
@@ -60,6 +78,7 @@ def install(self):
     install_actions(self, out)
     install_subskin(self, out)
     registerStylesheets(self, out, STYLESHEETS)
+    install_configlet(self, out)
     self.sin_tool.load('default.cfg')
     return out.getvalue()
 
@@ -67,4 +86,9 @@ def install(self):
 def uninstall(self):
     at = getToolByName(self, "portal_actions")
     at.deleteActionProvider('sin_tool')
+    
+    # unregister tool as configlet
+    portal_control_panel = getToolByName(self,'portal_controlpanel', None)
+    if portal_control_panel is not None:
+        portal_control_panel.unregisterConfiglet('sin_tool')
 

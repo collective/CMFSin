@@ -27,6 +27,7 @@ from Map import Map
 from Channel import Channel
 from rssparser import parse
 from OrderPolicy import listPolicies, SimplePolicy
+from Channel import TIME_KEY
 
 from AccessControl import allow_class
 
@@ -413,6 +414,157 @@ class SinTool(UniqueObject, ActionProviderBase, SimpleItem):
         return SinMacro(self)
 
     macros = ComputedAttribute(macros, 1)
+
+
+    ######## methods for the portal config interface ######
+
+    security.declareProtected(ManagePortal, 'manage_edit_sincfg')
+    def manage_edit_sincfg(self, REQUEST=None):
+        """
+            This method parses the user's input and generates the config file for the CMF SinTool.
+        """
+        if not REQUEST:
+            return
+        cfg = StringIO()
+        # this list is needed to keep track of all valid channels - used while handling maps
+        existing_channels = []
+        
+        cfg.write('[channels]\n')
+        # Existing channels (Edit)
+        for chan_name in REQUEST.get('chan_name', []):
+            # write all existing channels to the config, unless they are marked to be deleted
+            if not REQUEST.get('%s_delete' %chan_name, ''):
+                cfg.write('%s = ' %chan_name)
+                freq = REQUEST.get('%s_frequency' %chan_name, '1')
+                if freq.strip()=='': freq = '1'
+                cfg.write(freq)
+                period = REQUEST.get('%s_period' %chan_name, 'd')
+                cfg.write(period)
+                url = REQUEST.get('%s_url' %chan_name, '')
+                cfg.write(':%s\n' %url)
+                existing_channels.append(chan_name)
+
+        # New channel
+        chan_name_new = REQUEST.get('chan_name_new', '')
+        chan_url_new = REQUEST.get('chan_url_new', '')
+        # If information for a new channel was entered, write it to the config
+        if chan_name_new and chan_url_new:
+            cfg.write('%s = ' % chan_name_new)
+            freq = REQUEST.get('chan_frequency_new', '1')
+            if freq.strip()=='': freq = '1'
+            cfg.write(freq)
+            period = REQUEST.get('chan_period_new', 'd')
+            cfg.write(period)
+            cfg.write(':%s\n' %chan_url_new)
+            existing_channels.append(chan_name_new)
+
+        # Existing maps (Edit)
+        cfg.write('\n[maps]\n')
+        for map_name in REQUEST.get('map_name', []):
+            # write all existing maps to the config, unless they are are marked to be deleted
+            if not REQUEST.get('%s_delete' %map_name, ''):
+                channels = REQUEST.get('%s_channels' %map_name, [])
+                if type(channels) in (StringType, UnicodeType):
+                    channels = [channels]
+                if len(channels) > 0:
+                    # Filter out deleted channels
+                    channels = filter(lambda x: x in existing_channels, channels)
+                    # If there are no channels left, don't write the map
+                    if len(channels) >0:
+                        cfg.write('%s = ' %map_name)
+                        policy = REQUEST.get('%s_policy' %map_name, 'simple')
+                        cfg.write('%s:' %policy)
+                        cfg.write('%s\n' %', '.join(channels))
+
+        # New Map
+        map_name_new = REQUEST.get('map_name_new', '')
+        map_channels_new = REQUEST.get('map_channels_new', [])
+        if type(map_channels_new)in (StringType, UnicodeType):
+            map_channels_new = [map_channels_new]
+        # If information for a new map was entered, write it to the config
+        if map_name_new and len(map_channels_new) > 0:
+            cfg.write('%s = ' %map_name_new)
+            policy = REQUEST.get('map_policy_new', 'simple')
+            cfg.write('%s:' %policy)
+            cfg.write('%s\n' %', '.join(map_channels_new))
+
+        config_value = cfg.getvalue()
+        self.updateConfig(config_value)
+
+
+    security.declarePublic('getSinChannels')
+    def getSinChannels(self, cfg=None):
+        """
+            Convenience method that returns all channels from the config as a list of mappings
+            Code taken from the parse() method
+        """
+        if not cfg:
+            cfg = getattr(self, 'config', '')
+        if type(cfg) in (StringType, UnicodeType):
+            cfg = StringIO(cfg)
+        config = ConfigParser()
+        config.readfp(cfg)
+
+        s = 'channels'
+        options = config.options(s)
+        channels = []
+        for o in options:
+            uri =  config.get(s, o, raw=1)
+            period = 'd'
+            frequency = '1'
+            match = schedRe.match(uri)
+            if match:
+                uri = uri[match.end():]
+                period = match.group('period')
+                frequency = int(match.group('freq'))
+            channels.append({'name': o, 'url': uri, 'period': period, 'frequency': frequency})
+
+        return channels
+
+    security.declarePublic('getSinMaps')
+    def getSinMaps(self):
+        """
+            Convenience method that returns all maps from the config as a list of mappings
+            Code taken from the parse() method
+        """
+        sin_tool = getToolByName(self, 'sin_tool')
+        cfg = getattr(sin_tool, 'config', '')
+        cfg = StringIO(cfg)
+        config = ConfigParser()
+        config.readfp(cfg)
+
+        s = 'maps'
+        maps = []
+        options = config.options(s)
+        for o in options:
+            channels = config.get(s, o, raw=1)
+            #We look for policy_name:x,y,z
+            #if no policy is specified default is used
+            idx = channels.find(':')
+            policy = None
+            if idx != -1:
+                policy, channels = channels[:idx], channels[idx+1:]
+            channels = channels.split(',')
+            chans = []
+            for c in channels:
+                c = c.strip()  # remove whitespace around delimitters
+                if c.endswith(')'):
+                    #look for channel(pri) format
+                    idx = c.rfind('(')
+                    if idx != -1:
+                        c = c[:idx]
+                chans.append(c)
+            maps.append({'name':o, 'policy': policy, 'channels': chans})
+        return maps
+
+
+    security.declarePublic('getSinTimeKeys')
+    def getSinTimeKeys(self):
+        """
+            Convenience method that returns the TIME_KEY mapping from Channel
+        """
+        return TIME_KEY
+
 
 InitializeClass(SinTool)
 

@@ -1,0 +1,257 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      lang="en"
+      metal:use-macro="here/prefs_main_template/macros/master"
+      i18n:domain="plone">
+<body>
+
+  <div metal:fill-slot="prefs_configlet_main"
+    tal:define="errors options/state/getErrors;
+                sin_tool nocall:here/sin_tool;
+                channels sin_tool/getSinChannels;
+                maps     sin_tool/getSinMaps;
+                timeKeys sin_tool/getSinTimeKeys;
+                policies sin_tool/Policies">
+
+    <form name="sincfg_edit">
+      <h2>Channels</h2>
+      <table cellspacing="2" cellpadding="2" border="0">
+          <thead>
+            <tr>
+              <th align="left">Name</th>
+              <th>URL</th>
+              <th>Update period</th>
+              <th>Frequency</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+          <tr tal:repeat="chan channels">
+            <td>
+                <input type="hidden" value="" name="chan_name:list" 
+                    tal:attributes="value chan/name" />
+                 <label tal:content="chan/name" />
+            </td>
+            <td>
+            <input type="text" value="" size="60" name="url" 
+                tal:define="fieldname string:${chan/name}_url;"
+                tal:attributes="value python:request.get(fieldname, chan['url']);
+                name fieldname" />
+            </td>
+
+            <td>
+                <select size="1" name="period"
+                   tal:define="fieldname string:${chan/name}_period;
+                   period_val python:request.get(fieldname, chan['period'])"
+                   tal:attributes="name fieldname">
+                  <option tal:repeat="tk python:timeKeys.keys()" value=""
+                    tal:attributes="selected python:test(period_val==tk, 'selected', None);
+                    value tk"
+                    tal:content="python: timeKeys[tk]" />
+                </select>
+            </td>
+            <td>
+              <div class="field"
+                    tal:define="fieldname string:${chan/name}_frequency;
+                    error python:errors.get(fieldname, None)"
+                    tal:attributes="class python:test(error, 'field error', 'field')">
+                    
+                    <div tal:content="error" i18n:translate="">Validation error output</div>
+                    
+                <input type="text" value="" size="2" name="frequency" 
+                    tal:attributes="value python:request.get(fieldname, chan['frequency']);
+                    name fieldname" />
+               </div>
+            </td>
+            <td>
+                <input type="submit"
+                    tabindex=""
+                    name="form.button.Delete"
+                    value="Delete"
+                    tal:attributes="tabindex tabindex/next;
+                      name string:${chan/name}_delete" 
+                    i18n:attributes="value" />
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="5">
+                <h3>Add Channel</h3>
+             </td>
+          </tr>
+          <tr>
+            <td>
+                <input type="text" value="" size="20" name="chan_name_new"
+                    tal:attributes="value request/chan_name_new|string:" />
+            </td>
+            <td>
+            <input type="text" value="" size="60" name="chan_url_new"
+                    tal:attributes="value request/chan_url_new|string:" />
+            </td>
+            <td>
+                <select size="1" name="chan_period_new"
+                    tal:define="period_val request/chan_period_new|string:d">
+                  <option tal:repeat="tk python:timeKeys.keys()" value=""
+                    tal:attributes="value tk; selected python:test(period_val==tk, 'selected', None)"
+                    tal:content="python: timeKeys[tk]" />
+                </select>
+            </td>
+            <td>
+              <div class="field"
+                    tal:define="error errors/chan_frequency_new|nothing;
+                    frequency request/chan_frequency_new|string:1"
+                    tal:attributes="class python:test(error, 'field error', 'field')">
+                    
+                    <div tal:content="error" i18n:translate="">Validation error output</div> 
+                <input type="text" value="" size="2" name="chan_frequency_new" 
+                        tal:attributes="value frequency"/>
+              </div>
+            </td>
+            <td>
+                <input type="submit"
+                    tabindex=""
+                    name="form.button.AddChannel"
+                    value="Add Channel"
+                    tal:attributes="tabindex tabindex/next;"
+                    i18n:attributes="value" />
+            </td>
+          </tr>
+        </tbody>
+
+        <tr>
+            <td colspan="5">
+              <!-- actually these controls are not necessary, the ones at the bottom would be enough.
+                    but when there are lots of maps and channels, its convenient to have them here -->
+              <div class="formControls">
+                  <input class="context"
+                         tabindex=""
+                         type="submit"
+                         name="form.button.Save"
+                         value="Save"
+                         tal:attributes="tabindex tabindex/next;" 
+                         i18n:attributes="value" />
+            
+                  <input class="standalone"
+                         tabindex=""
+                         type="submit"
+                         name="form.button.Cancel"
+                         value="Cancel"
+                         tal:attributes="tabindex tabindex/next;" 
+                         i18n:attributes="value" />
+              </div>
+            </td>
+        </tr>
+
+      <tr>
+       <td colspan="5"><h2>Maps</h2></td>
+        <thead>
+           <tr>
+             <th align="left">Name</th>
+             <th>Channels</th>
+             <th>Policy</th>
+             <th>&nbsp;</th>
+             <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr tal:repeat="mymap maps">
+              <td>
+                <input type="hidden" size="20" name="map_name:list" value=""
+                    tal:attributes="value mymap/name" />
+                    <label tal:content="mymap/name" />
+              </td>
+
+              <td align="center">
+                <select size="3" multiple="multiple" name="channels"
+                  tal:define="fieldname string:${mymap/name}_channels;
+                  channels_val python:request.get(fieldname, mymap['channels'])"
+                  tal:attributes="name fieldname">
+                  <option tal:repeat="chan channels" value=""
+                    tal:attributes="selected python:test(chan['name'] in channels_val, 'selected', None);
+                      value chan/name"
+                      tal:content="chan/name" />
+                </select>
+              </td>
+              <td colspan="2">
+                <select size="1" name="policy"
+                  tal:define="fieldname string:${mymap/name}_policy;
+                  policy_val python:request.get(fieldname, mymap['policy'])"
+                  tal:attributes="name fieldname">
+                    <option tal:repeat="pc policies" value=""
+                     tal:attributes="selected python:test(pc==policy_val, 'selected', None);
+                     value pc" tal:content="pc" />
+                </select>
+              </td>
+            <td>
+                <input type="submit"
+                    tabindex=""
+                    name="form.button.Delete"
+                    value="Delete"
+                    tal:attributes="tabindex tabindex/next;
+                      name string:${mymap/name}_delete" 
+                    i18n:attributes="value" />
+            </td>
+          </tr>
+          <tr>
+            <td  colspan="5">
+                <h3>Add Map</h3>
+             </td>
+          </tr>
+          <tr>
+              <td>
+                <input type="text" size="20" name="map_name_new" value="" 
+                    tal:attributes="value request/map_name_new|string:"/>
+              </td>
+
+              <td align="center">
+                <select size="3" multiple="multiple" name="map_channels_new" 
+                    tal:define="channels_val request/map_channels_new|python:[]">
+                  <option tal:repeat="chan channels" value=""
+                    tal:attributes="value chan/name;
+                            selected python:test(chan['name'] in channels_val, 'selected', None)"
+                      tal:content="chan/name" />
+                </select>
+              </td>
+              <td colspan="2">
+                <select size="1" name="map_policy_new" 
+                    tal:define="policy_val request/map_policy_new|string:simple">
+                    <option tal:repeat="pc policies" value=""
+                     tal:attributes="selected python:test(pc==policy_val, 'selected', None);
+                     value pc" tal:content="pc" />
+                </select>
+              </td>
+              <td>
+                <input type="submit"
+                    tabindex=""
+                    name="form.button.AddMap"
+                    value="Add Map"
+                    tal:attributes="tabindex tabindex/next;"
+                    i18n:attributes="value" />
+             </td>
+           </tr>
+          </tbody>
+        </table>
+
+      <input type="hidden" name="form.submitted" value="1" />
+      <div class="formControls">
+          <input class="context"
+                 tabindex=""
+                 type="submit"
+                 name="form.button.Save"
+                 value="Save"
+                 tal:attributes="tabindex tabindex/next;" 
+                 i18n:attributes="value" />
+    
+          <input class="standalone"
+                 tabindex=""
+                 type="submit"
+                 name="form.button.Cancel"
+                 value="Cancel"
+                 tal:attributes="tabindex tabindex/next;" 
+                 i18n:attributes="value" />
+      </div>
+    </form>
+    
+</div>
+
+</body>
+</html>
