@@ -14,6 +14,21 @@
 
     <form name="sincfg_edit">
       <h2>Channels</h2>
+      <div class="formHelp">A channel 
+            holds the actual URL information of an RSS feed. The following attributes can 
+            be set:
+            <ul>
+                <li><strong>Name</strong>
+                    An arbitrary name for your channel</li>
+                <li><strong>URL</strong>
+                    The URI of the feed's source. E.g. http://mysite.org/news.rdf</li>
+                <li><strong>Update period</strong>
+                    Sets the interval of how often the source is queried for updates</li>
+                <li><strong>Frequency</strong>
+                    Also part of the update interval setting. You must enter integer numbers.
+                    Example: &quot;hourly 4&quot; means update every 4 hours</li>
+            </ul>
+       </div>
       <table cellspacing="2" cellpadding="2" border="0">
           <thead>
             <tr>
@@ -142,7 +157,22 @@
         </tr>
 
       <tr>
-       <td colspan="5"><h2>Maps</h2></td>
+       <td colspan="5"><h2>Maps</h2>
+        <div class="formHelp">
+            Maps can be used to combine the results of different Channels. The following attributes can 
+            be set:
+            <ul>
+                <li><strong>Name</strong>
+                    An arbitrary name for your Map. It is used to address the Map, e.g. in portlets.</li>
+                <li><strong>Channels</strong>
+                    By selecting one or more Channels, you can determine what content shows up
+                    in your Map</li>
+                <li><strong>Policy</strong>
+                    The policy lets you determine how the contents of different Channels are combined. Of course
+                    this is only relevant if the Map holds more than one Channel.</li>
+            </ul>
+        </div>
+       </td>
         <thead>
            <tr>
              <th align="left">Name</th>
