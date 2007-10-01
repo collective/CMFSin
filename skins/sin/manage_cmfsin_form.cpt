@@ -36,7 +36,7 @@
               <th>URL</th>
               <th>Update period</th>
               <th>Frequency</th>
-              <th>Action</th>
+              <th align="right">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -53,7 +53,7 @@
                 name fieldname" />
             </td>
 
-            <td>
+            <td align="center">
                 <select size="1" name="period"
                    tal:define="fieldname string:${chan/name}_period;
                    period_val python:request.get(fieldname, chan['period'])"
@@ -64,7 +64,7 @@
                     tal:content="python: timeKeys[tk]" />
                 </select>
             </td>
-            <td>
+            <td align="center">
               <div class="field"
                     tal:define="fieldname string:${chan/name}_frequency;
                     error python:errors.get(fieldname, None)"
@@ -77,7 +77,7 @@
                     name fieldname" />
                </div>
             </td>
-            <td>
+            <td align="right">
                 <input type="submit"
                     tabindex=""
                     name="form.button.Delete"
@@ -102,7 +102,7 @@
             <input type="text" value="" size="60" name="chan_url_new"
                     tal:attributes="value request/chan_url_new|string:" />
             </td>
-            <td>
+            <td align="center">
                 <select size="1" name="chan_period_new"
                     tal:define="period_val request/chan_period_new|string:d">
                   <option tal:repeat="tk python:timeKeys.keys()" value=""
@@ -110,7 +110,7 @@
                     tal:content="python: timeKeys[tk]" />
                 </select>
             </td>
-            <td>
+            <td align="center">
               <div class="field"
                     tal:define="error errors/chan_frequency_new|nothing;
                     frequency request/chan_frequency_new|string:1"
@@ -121,7 +121,7 @@
                         tal:attributes="value frequency"/>
               </div>
             </td>
-            <td>
+            <td align="right">
                 <input type="submit"
                     tabindex=""
                     name="form.button.AddChannel"
@@ -177,9 +177,8 @@
            <tr>
              <th align="left">Name</th>
              <th>Channels</th>
-             <th>Policy</th>
-             <th>&nbsp;</th>
-             <th>Action</th>
+             <th colspan="2">Policy</th>
+             <th align="right">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -201,7 +200,7 @@
                       tal:content="chan/name" />
                 </select>
               </td>
-              <td colspan="2">
+              <td colspan="2" align="center">
                 <select size="1" name="policy"
                   tal:define="fieldname string:${mymap/name}_policy;
                   policy_val python:request.get(fieldname, mymap['policy'])"
@@ -211,7 +210,7 @@
                      value pc" tal:content="pc" />
                 </select>
               </td>
-            <td>
+            <td align="right">
                 <input type="submit"
                     tabindex=""
                     name="form.button.Delete"
@@ -241,7 +240,7 @@
                       tal:content="chan/name" />
                 </select>
               </td>
-              <td colspan="2">
+              <td colspan="2" align="center">
                 <select size="1" name="map_policy_new" 
                     tal:define="policy_val request/map_policy_new|string:simple">
                     <option tal:repeat="pc policies" value=""
@@ -249,7 +248,7 @@
                      value pc" tal:content="pc" />
                 </select>
               </td>
-              <td>
+              <td align="right">
                 <input type="submit"
                     tabindex=""
                     name="form.button.AddMap"
