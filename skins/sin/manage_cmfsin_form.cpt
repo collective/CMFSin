@@ -12,7 +12,7 @@
                 timeKeys sin_tool/getSinTimeKeys;
                 policies sin_tool/Policies">
 
-    <form name="sincfg_edit">
+    <form name="sincfg_edit" method="post" id="sincfg_edit_form">
       <h2>Channels</h2>
       <div class="formHelp">A channel 
             holds the actual URL information of an RSS feed. The following attributes can 
