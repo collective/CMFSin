@@ -25,6 +25,8 @@
 
     <dl>
     <tal:block repeat="obj batch">
+      <span tal:define="description obj/description|nothing;
+          date obj/date|nothing">
 		<dt>
             <span class="contenttype-link">
                 <a href="#"
@@ -32,14 +34,15 @@
                    tal:content="structure obj/title">title</a>
             </span>
             <span class="discreet"
-                  tal:condition="python:obj.get('date') or nothing"
+                  tal:condition="date"
                   i18n:translate="results_by_author">
-                by <span tal:replace="python:obj.get('author', '')" i18n:name="author">author</span>,
-                <span tal:replace="python:here.toLocalizedTime(obj['date'], long_format=1)" i18n:name="date">date</span>
+                by <span tal:replace="obj/author|string:" i18n:name="author">author</span>,
+                <span tal:replace="python:here.toLocalizedTime(date, long_format=1)" i18n:name="date">date</span>
             </span>
         </dt>
-		<dd tal:condition="python:verbose and obj.get('description') or nothing"
+		<dd tal:condition="python:verbose and description"
             tal:content="structure obj/description">description</dd>
+      </span>
     </tal:block>
 	</dl>
 
